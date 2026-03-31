@@ -7,6 +7,10 @@ type PetSelectionListProps = {
 }
 
 function PetSelectionList(_: PetSelectionListProps) {
+<<<<<<< Updated upstream
+=======
+  void _
+>>>>>>> Stashed changes
   return null
 }
 

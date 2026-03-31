@@ -5,6 +5,10 @@ type StatsPanelProps = {
 }
 
 function StatsPanel(_: StatsPanelProps) {
+<<<<<<< Updated upstream
+=======
+  void _
+>>>>>>> Stashed changes
   return null
 }
 

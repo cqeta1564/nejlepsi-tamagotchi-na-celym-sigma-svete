@@ -4,6 +4,10 @@ type PetNameProps = {
 }
 
 function PetName(_: PetNameProps) {
+<<<<<<< Updated upstream
+=======
+  void _
+>>>>>>> Stashed changes
   return null
 }
 

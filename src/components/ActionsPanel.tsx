@@ -6,6 +6,10 @@ type ActionsPanelProps = {
 }
 
 function ActionsPanel(_: ActionsPanelProps) {
+<<<<<<< Updated upstream
+=======
+  void _
+>>>>>>> Stashed changes
   return null
 }
 

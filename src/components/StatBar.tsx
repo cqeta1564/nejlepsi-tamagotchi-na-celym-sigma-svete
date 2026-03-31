@@ -7,6 +7,10 @@ type StatBarProps = {
 }
 
 function StatBar(_: StatBarProps) {
+<<<<<<< Updated upstream
+=======
+  void _
+>>>>>>> Stashed changes
   return null
 }
 

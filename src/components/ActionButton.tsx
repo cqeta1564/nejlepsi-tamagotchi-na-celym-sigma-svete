@@ -6,6 +6,10 @@ type ActionButtonProps = {
 }
 
 function ActionButton(_: ActionButtonProps) {
+<<<<<<< Updated upstream
+=======
+  void _
+>>>>>>> Stashed changes
   return null
 }
 

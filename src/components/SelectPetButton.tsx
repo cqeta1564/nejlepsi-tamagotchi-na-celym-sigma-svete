@@ -4,6 +4,10 @@ type SelectPetButtonProps = {
 }
 
 function SelectPetButton(_: SelectPetButtonProps) {
+<<<<<<< Updated upstream
+=======
+  void _
+>>>>>>> Stashed changes
   return null
 }
 

@@ -4,6 +4,10 @@ type PetAvatarProps = {
 }
 
 function PetAvatar(_: PetAvatarProps) {
+<<<<<<< Updated upstream
+=======
+  void _
+>>>>>>> Stashed changes
   return null
 }
 

@@ -8,6 +8,10 @@ type PetSelectionScreenProps = {
 }
 
 function PetSelectionScreen(_: PetSelectionScreenProps) {
+<<<<<<< Updated upstream
+=======
+  void _
+>>>>>>> Stashed changes
   return null
 }
 

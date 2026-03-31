@@ -6,6 +6,10 @@ type StatusModalProps = {
 }
 
 function StatusModal(_: StatusModalProps) {
+<<<<<<< Updated upstream
+=======
+  void _
+>>>>>>> Stashed changes
   return null
 }
 

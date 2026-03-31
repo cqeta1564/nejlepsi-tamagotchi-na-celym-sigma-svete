@@ -4,6 +4,10 @@ type ScreenHeaderProps = {
 }
 
 function ScreenHeader(_: ScreenHeaderProps) {
+<<<<<<< Updated upstream
+=======
+  void _
+>>>>>>> Stashed changes
   return null
 }
 

@@ -5,6 +5,10 @@ type PetCardProps = {
 }
 
 function PetCard(_: PetCardProps) {
+<<<<<<< Updated upstream
+=======
+  void _
+>>>>>>> Stashed changes
   return null
 }
 

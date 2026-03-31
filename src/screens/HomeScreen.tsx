@@ -7,6 +7,10 @@ type HomeScreenProps = {
 }
 
 function HomeScreen(_: HomeScreenProps) {
+<<<<<<< Updated upstream
+=======
+  void _
+>>>>>>> Stashed changes
   return null
 }
 
