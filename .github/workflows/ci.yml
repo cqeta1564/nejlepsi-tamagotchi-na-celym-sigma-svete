@@ -13,12 +13,21 @@ jobs:
 
     steps:
       - name: Checkout repository
+<<<<<<< Updated upstream
         uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
+=======
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+>>>>>>> Stashed changes
           cache: npm
 
       - name: Install dependencies
