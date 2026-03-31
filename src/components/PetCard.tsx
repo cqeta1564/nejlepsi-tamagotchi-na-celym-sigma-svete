@@ -4,11 +4,8 @@ type PetCardProps = {
   pet: Pet
 }
 
-function PetCard(_: PetCardProps) {
-<<<<<<< Updated upstream
-=======
-  void _
->>>>>>> Stashed changes
+function PetCard(props: PetCardProps) {
+  void props
   return null
 }
 

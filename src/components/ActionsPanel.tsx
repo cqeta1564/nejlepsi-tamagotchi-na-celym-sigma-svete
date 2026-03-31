@@ -5,11 +5,8 @@ type ActionsPanelProps = {
   onActionClick: (actionId: PetAction['id']) => void
 }
 
-function ActionsPanel(_: ActionsPanelProps) {
-<<<<<<< Updated upstream
-=======
-  void _
->>>>>>> Stashed changes
+function ActionsPanel(props: ActionsPanelProps) {
+  void props
   return null
 }
 

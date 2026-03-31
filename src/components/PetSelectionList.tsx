@@ -6,11 +6,8 @@ type PetSelectionListProps = {
   onSelect: (petId: string) => void
 }
 
-function PetSelectionList(_: PetSelectionListProps) {
-<<<<<<< Updated upstream
-=======
-  void _
->>>>>>> Stashed changes
+function PetSelectionList(props: PetSelectionListProps) {
+  void props
   return null
 }
 

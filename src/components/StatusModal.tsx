@@ -5,11 +5,8 @@ type StatusModalProps = {
   onClose: () => void
 }
 
-function StatusModal(_: StatusModalProps) {
-<<<<<<< Updated upstream
-=======
-  void _
->>>>>>> Stashed changes
+function StatusModal(props: StatusModalProps) {
+  void props
   return null
 }
 

@@ -3,11 +3,8 @@ type PetNameProps = {
   species: string
 }
 
-function PetName(_: PetNameProps) {
-<<<<<<< Updated upstream
-=======
-  void _
->>>>>>> Stashed changes
+function PetName(props: PetNameProps) {
+  void props
   return null
 }
 

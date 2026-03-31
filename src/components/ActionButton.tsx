@@ -5,11 +5,8 @@ type ActionButtonProps = {
   onClick: (actionId: PetAction['id']) => void
 }
 
-function ActionButton(_: ActionButtonProps) {
-<<<<<<< Updated upstream
-=======
-  void _
->>>>>>> Stashed changes
+function ActionButton(props: ActionButtonProps) {
+  void props
   return null
 }
 

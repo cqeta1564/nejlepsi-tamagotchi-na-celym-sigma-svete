@@ -6,11 +6,8 @@ type HomeScreenProps = {
   onActionClick: (actionId: PetAction['id']) => void
 }
 
-function HomeScreen(_: HomeScreenProps) {
-<<<<<<< Updated upstream
-=======
-  void _
->>>>>>> Stashed changes
+function HomeScreen(props: HomeScreenProps) {
+  void props
   return null
 }
 

@@ -7,11 +7,8 @@ type PetSelectionScreenProps = {
   onConfirmSelection: () => void
 }
 
-function PetSelectionScreen(_: PetSelectionScreenProps) {
-<<<<<<< Updated upstream
-=======
-  void _
->>>>>>> Stashed changes
+function PetSelectionScreen(props: PetSelectionScreenProps) {
+  void props
   return null
 }
 

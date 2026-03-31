@@ -4,11 +4,8 @@ type StatsPanelProps = {
   stats: PetStats
 }
 
-function StatsPanel(_: StatsPanelProps) {
-<<<<<<< Updated upstream
-=======
-  void _
->>>>>>> Stashed changes
+function StatsPanel(props: StatsPanelProps) {
+  void props
   return null
 }
 

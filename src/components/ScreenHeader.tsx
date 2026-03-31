@@ -3,11 +3,8 @@ type ScreenHeaderProps = {
   subtitle?: string
 }
 
-function ScreenHeader(_: ScreenHeaderProps) {
-<<<<<<< Updated upstream
-=======
-  void _
->>>>>>> Stashed changes
+function ScreenHeader(props: ScreenHeaderProps) {
+  void props
   return null
 }
 

@@ -6,11 +6,8 @@ type StatBarProps = {
   value: number
 }
 
-function StatBar(_: StatBarProps) {
-<<<<<<< Updated upstream
-=======
-  void _
->>>>>>> Stashed changes
+function StatBar(props: StatBarProps) {
+  void props
   return null
 }
 

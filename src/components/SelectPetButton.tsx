@@ -3,11 +3,8 @@ type SelectPetButtonProps = {
   onClick: () => void
 }
 
-function SelectPetButton(_: SelectPetButtonProps) {
-<<<<<<< Updated upstream
-=======
-  void _
->>>>>>> Stashed changes
+function SelectPetButton(props: SelectPetButtonProps) {
+  void props
   return null
 }
 

@@ -3,11 +3,8 @@ type PetAvatarProps = {
   alt: string
 }
 
-function PetAvatar(_: PetAvatarProps) {
-<<<<<<< Updated upstream
-=======
-  void _
->>>>>>> Stashed changes
+function PetAvatar(props: PetAvatarProps) {
+  void props
   return null
 }
 
