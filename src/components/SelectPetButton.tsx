@@ -3,9 +3,20 @@ type SelectPetButtonProps = {
   onClick: () => void
 }
 
-function SelectPetButton(props: SelectPetButtonProps) {
-  void props
-  return null
+function SelectPetButton({
+  disabled = false,
+  onClick,
+}: SelectPetButtonProps) {
+  return (
+    <button
+      type="button"
+      className="primary-button"
+      disabled={disabled}
+      onClick={onClick}
+    >
+      Zacit hru
+    </button>
+  )
 }
 
 export default SelectPetButton
