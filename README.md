@@ -52,6 +52,14 @@ npm run lint
 npm run preview
 ```
 
+## GitHub Pages
+
+Projekt je pripraveny na nasazeni pres GitHub Pages.
+
+- workflow pro deploy je v `.github/workflows/deploy-pages.yml`
+- pri buildu na GitHub Actions se automaticky nastavi spravny `base` path podle nazvu repozitare
+- pro prvni publikaci je potreba v nastaveni repozitare zapnout GitHub Pages a jako source ponechat GitHub Actions
+
 ## Herni logika
 
 - stav aplikace se spravuje centralne pres `useReducer`
