@@ -1,73 +1,74 @@
-# React + TypeScript + Vite
+# Nejlepsi tamagotchi na celym sigma svete
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Minimalni MVP Tamagotchi aplikace postavene ve `Vite + React + TypeScript`.
 
-Currently, two official plugins are available:
+Projekt obsahuje vyber mazlicka, herni smycku se zhorsovanim statu v case, akce nad petem a obnovu postupu z `localStorage`.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Co umi aplikace
 
-## React Compiler
+- vyber jednoho ze 3 vzorovych mazlicku
+- zobrazeni aktualnich statu: `food`, `health`, `happiness`, `energy`
+- herni akce `feed`, `play`, `sleep`, `heal`
+- automaticky tick pres `setInterval`, ktery postupne zhorsuje staty
+- odvozeny stav mazlicka: `mood`, `status`, `statusMessage`, `alive`
+- game over pri padu zdravi na `0`
+- automaticke ukladani a obnoveni hry z `localStorage`
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Pouzite technologie
 
-## Expanding the ESLint configuration
+- React 19
+- TypeScript
+- Vite
+- ESLint
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Struktura projektu
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```text
+src/
+  components/   Znovupouzitelne UI komponenty
+  data/         Vzorova data mazlicku a akci
+  hooks/        Custom hooky
+  screens/      Slozene obrazovky aplikace
+  state/        Herni reducer a logika Tamagotchi
+  utils/        Utility pro storage a praci se staty
+  types.ts      Sdilene TypeScript typy
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Spusteni projektu
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
 ```
+
+Aplikace se potom otevre ve Vite development serveru, standardne na `http://localhost:5173`.
+
+## Dostupne skripty
+
+```bash
+npm run dev
+npm run build
+npm run lint
+npm run preview
+```
+
+## Herni logika
+
+- stav aplikace se spravuje centralne pres `useReducer`
+- kazdych `5` sekund probiha tick, ktery snizuje vybrane staty
+- vsechny hodnoty jsou omezeny do rozsahu `0-100`
+- nizke hodnoty `food`, `energy` a `happiness` postupne poskozuji `health`
+- pokud `health` klesne na `0`, mazlicek uz neni `alive`
+
+## Ukladani stavu
+
+Hra se uklada automaticky do `localStorage` pod klicem `sigma-tamagotchi-state`. Po reloadu stranky se posledni stav obnovi.
+
+## Stav odevzdani
+
+Repo aktualne obsahuje funkcni MVP pro Role B:
+
+- tyden 1: komponenty, typy, vzorova data a zakladni struktura projektu
+- tyden 2: herni logika, reducer, interval, odvozeny stav a persistence
+
+Poznamka: nastaveni collaboratoru na GitHubu neni soucasti souboru v repozitari, takze se overuje mimo kodovou zakladnu.
