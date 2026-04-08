@@ -30,8 +30,7 @@ function App() {
   const [isStorageErrorDismissed, setIsStorageErrorDismissed] = useState(false)
 
   const selectedPet = getSelectedPet(state)
-  const selectedPetIsAlive =
-    selectedPet !== null && selectedPet.stats.health > 0
+  const selectedPetIsAlive = selectedPet !== null && selectedPet.alive
 
   useEffect(() => {
     setStoredState(state)
@@ -174,7 +173,7 @@ function App() {
         <p>Staty se zhorsuji kazdych {TICK_INTERVAL_MS / 1000} sekund a hra se uklada automaticky.</p>
         <p>
           {state.currentScreen === 'home' && selectedPet !== null
-            ? `Aktivni mazlicek: ${selectedPet.name}`
+            ? `Aktivni mazlicek: ${selectedPet.name}. ${selectedPet.statusMessage}`
             : 'Vyber si mazlicka a spust hru.'}
         </p>
       </footer>

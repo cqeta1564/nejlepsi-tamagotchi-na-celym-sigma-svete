@@ -26,6 +26,7 @@ function PetCard({ pet }: PetCardProps) {
         </div>
 
         <p className="pet-card__description">{pet.description}</p>
+        <p className="pet-card__status">{pet.statusMessage}</p>
       </div>
     </article>
   )

@@ -30,12 +30,16 @@ function HomeScreen({
     <section className="screen">
       <ScreenHeader
         title={`Ahoj, ${pet.name}`}
-        subtitle={`${pet.species} je ted ${MOOD_COPY[pet.mood]}`}
+        subtitle={`${pet.species} je ted ${MOOD_COPY[pet.mood]} ${pet.statusMessage}`}
       />
 
       <PetCard pet={pet} />
       <StatsPanel stats={pet.stats} />
-      <ActionsPanel actions={actions} onActionClick={onActionClick} />
+      <ActionsPanel
+        actions={actions}
+        disabled={!pet.alive}
+        onActionClick={onActionClick}
+      />
 
       <div className="home-screen__toolbar">
         <button type="button" className="secondary-button" onClick={onChangePet}>

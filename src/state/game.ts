@@ -1,10 +1,19 @@
 import { mockPets } from '../data/pets'
-import type { GameState, Pet, PetAction, PetMood, PetStatKey, PetStats } from '../types'
+import type {
+  GameState,
+  Pet,
+  PetAction,
+  PetMood,
+  PetSeed,
+  PetStatKey,
+  PetStats,
+  PetStatus,
+} from '../types'
+import { clampPercentage } from '../utils/stats'
 
 export const STORAGE_KEY = 'sigma-tamagotchi-state'
 export const TICK_INTERVAL_MS = 5000
 
-const MAX_STAT = 100
 const MIN_STAT = 0
 const LOW_STAT_THRESHOLD = 24
 const DEFAULT_SELECTED_PET_ID = mockPets[0]?.id ?? null
@@ -129,7 +138,7 @@ export function getSelectedPet(state: GameState) {
 }
 
 export function isPetAlive(pet: Pet | null): pet is Pet {
-  return Boolean(pet && pet.stats.health > MIN_STAT)
+  return Boolean(pet?.alive)
 }
 
 function updateSelectedPet(
@@ -191,8 +200,9 @@ function tickPet(pet: Pet) {
   return buildPetFromStats(pet, nextStats)
 }
 
-function normalizePet(pet: PartialPet | undefined, fallbackPet: Pet): Pet {
+function normalizePet(pet: PartialPet | undefined, fallbackPet: PetSeed): Pet {
   const stats = normalizeStats(pet?.stats, fallbackPet.stats)
+  const derivedState = derivePetState(stats)
 
   return {
     id: typeof pet?.id === 'string' ? pet.id : fallbackPet.id,
@@ -204,8 +214,8 @@ function normalizePet(pet: PartialPet | undefined, fallbackPet: Pet): Pet {
         ? pet.description
         : fallbackPet.description,
     image: typeof pet?.image === 'string' ? pet.image : fallbackPet.image,
-    mood: deriveMood(stats),
     stats,
+    ...derivedState,
   }
 }
 
@@ -232,10 +242,35 @@ function normalizeStats(
 }
 
 function buildPetFromStats(pet: Pet, stats: PetStats): Pet {
+  const derivedState = derivePetState(stats)
+
   return {
     ...pet,
     stats,
-    mood: deriveMood(stats),
+    ...derivedState,
+  }
+}
+
+function derivePetState(stats: PetStats): Pick<Pet, 'alive' | 'mood' | 'status' | 'statusMessage'> {
+  const alive = stats.health > MIN_STAT
+
+  if (!alive) {
+    return {
+      alive: false,
+      mood: 'sick',
+      status: 'game-over',
+      statusMessage: 'Zdravi kleslo na nulu a mazlicek potrebuje novy start.',
+    }
+  }
+
+  const mood = deriveMood(stats)
+  const status = deriveStatus(stats)
+
+  return {
+    alive: true,
+    mood,
+    status,
+    statusMessage: deriveStatusMessage(status, stats),
   }
 }
 
@@ -255,6 +290,57 @@ function deriveMood(stats: PetStats): PetMood {
   return 'happy'
 }
 
+function deriveStatus(stats: PetStats): PetStatus {
+  if (stats.health <= MIN_STAT) {
+    return 'game-over'
+  }
+
+  if (stats.health <= LOW_STAT_THRESHOLD || stats.happiness <= LOW_STAT_THRESHOLD) {
+    return 'critical'
+  }
+
+  if (stats.food <= LOW_STAT_THRESHOLD) {
+    return 'hungry'
+  }
+
+  if (stats.energy <= LOW_STAT_THRESHOLD) {
+    return 'sleepy'
+  }
+
+  if (
+    stats.food >= 70 &&
+    stats.health >= 70 &&
+    stats.happiness >= 70 &&
+    stats.energy >= 70
+  ) {
+    return 'thriving'
+  }
+
+  return 'stable'
+}
+
+function deriveStatusMessage(status: PetStatus, stats: PetStats) {
+  switch (status) {
+    case 'game-over':
+      return 'Zdravi uz spadlo na nulu. Mazlicek potrebuje novy start.'
+    case 'critical':
+      if (stats.health <= LOW_STAT_THRESHOLD) {
+        return 'Zdravi je kriticky nizko. Hodilo by se uzdraveni a odpocinek.'
+      }
+
+      return 'Nalada je na minimu. Hra nebo krmeni pomuze vratit radost.'
+    case 'hungry':
+      return 'Brisko je skoro prazdne. Cas na poradne jidlo.'
+    case 'sleepy':
+      return 'Dochazi energie. Kratky spanek ho rychle postavi na nohy.'
+    case 'thriving':
+      return 'Vsechno slape skvele. Mazlicek je ve forme.'
+    case 'stable':
+    default:
+      return 'Drzi se v pohode, ale stale potrebuje pravidelnou peci.'
+  }
+}
+
 function clampStat(value: number) {
-  return Math.min(MAX_STAT, Math.max(MIN_STAT, Math.round(value)))
+  return clampPercentage(value)
 }

@@ -4,6 +4,14 @@ export type PetStatKey = 'food' | 'health' | 'happiness' | 'energy'
 
 export type PetMood = 'happy' | 'hungry' | 'sleepy' | 'sick'
 
+export type PetStatus =
+  | 'thriving'
+  | 'stable'
+  | 'hungry'
+  | 'sleepy'
+  | 'critical'
+  | 'game-over'
+
 export type PetActionType = 'feed' | 'heal' | 'play' | 'sleep'
 
 export interface PetStats {
@@ -13,15 +21,23 @@ export interface PetStats {
   energy: number
 }
 
-export interface Pet {
+export interface PetBase {
   id: string
   name: string
   species: string
   description: string
-  mood: PetMood
   image: string
   stats: PetStats
 }
+
+export interface Pet extends PetBase {
+  mood: PetMood
+  status: PetStatus
+  alive: boolean
+  statusMessage: string
+}
+
+export type PetSeed = Omit<Pet, 'alive' | 'status' | 'statusMessage'>
 
 export interface PetAction {
   id: PetActionType
