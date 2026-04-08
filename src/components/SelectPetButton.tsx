@@ -14,7 +14,7 @@ function SelectPetButton({
       disabled={disabled}
       onClick={onClick}
     >
-      Zacit hru
+      Potvrdit vyber
     </button>
   )
 }

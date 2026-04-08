@@ -34,8 +34,6 @@ function PetOptionCard({
           <span className="pet-option__species">{pet.species}</span>
         </span>
 
-        <span className="pet-option__description">{pet.description}</span>
-
         <span className="pet-option__summary">
           <span>{MOOD_COPY[pet.mood]}</span>
           <span>HP {pet.stats.health}%</span>

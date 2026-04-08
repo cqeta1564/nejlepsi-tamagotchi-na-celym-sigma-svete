@@ -13,6 +13,7 @@ export type PetStatus =
   | 'game-over'
 
 export type PetActionType = 'feed' | 'heal' | 'play' | 'sleep'
+export type RoomId = 'kitchen' | 'corner-shop' | 'station-park' | 'casino'
 
 export interface PetStats {
   food: number
@@ -46,8 +47,16 @@ export interface PetAction {
   effects: Partial<Record<PetStatKey, number>>
 }
 
+export interface Room {
+  id: RoomId
+  name: string
+  description: string
+  actionId: PetActionType
+}
+
 export interface GameState {
   currentScreen: AppScreen
   selectedPetId: string | null
+  currentRoomIndex: number
   pets: Pet[]
 }

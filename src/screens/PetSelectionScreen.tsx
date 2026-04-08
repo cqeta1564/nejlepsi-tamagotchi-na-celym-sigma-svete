@@ -21,8 +21,8 @@ function PetSelectionScreen({
   return (
     <section className="screen">
       <ScreenHeader
-        title="Vyber si mazlicka"
-        subtitle="Kazdy pet ma vlastni startovni statistiky. Vyber ulozime automaticky."
+        title="1. Vyber si sveho mazlicka"
+        subtitle="Vyber se ulozi automaticky a hru spustis jednim tlacitkem."
       />
 
       <PetSelectionList
