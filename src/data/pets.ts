@@ -1,6 +1,6 @@
-import type { Pet } from '../types'
+import type { PetSeed } from '../types'
 
-export const mockPets: Pet[] = [
+export const mockPets: PetSeed[] = [
   {
     id: 'pet-1',
     name: 'Mochi',

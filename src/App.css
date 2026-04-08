@@ -1,184 +1,441 @@
-.counter {
-  font-size: 16px;
-  padding: 5px 10px;
-  border-radius: 5px;
-  color: var(--accent);
-  background: var(--accent-bg);
-  border: 2px solid transparent;
-  transition: border-color 0.3s;
-  margin-bottom: 24px;
-
-  &:hover {
-    border-color: var(--accent-border);
-  }
-  &:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-  }
-}
-
-.hero {
-  position: relative;
-
-  .base,
-  .framework,
-  .vite {
-    inset-inline: 0;
-    margin: 0 auto;
-  }
-
-  .base {
-    width: 170px;
-    position: relative;
-    z-index: 0;
-  }
-
-  .framework,
-  .vite {
-    position: absolute;
-  }
-
-  .framework {
-    z-index: 1;
-    top: 34px;
-    height: 28px;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(44deg) rotateY(39deg)
-      scale(1.4);
-  }
-
-  .vite {
-    z-index: 0;
-    top: 107px;
-    height: 26px;
-    width: auto;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(40deg) rotateY(39deg)
-      scale(0.8);
-  }
-}
-
-#center {
+.app-shell {
+  min-height: 100svh;
   display: flex;
   flex-direction: column;
-  gap: 25px;
-  place-content: center;
-  place-items: center;
-  flex-grow: 1;
-
-  @media (max-width: 1024px) {
-    padding: 32px 20px 24px;
-    gap: 18px;
-  }
+  gap: 1.5rem;
+  padding: 1rem;
 }
 
-#next-steps {
+.app-shell__header,
+.app-shell__footer,
+.screen,
+.pet-card,
+.stats-panel,
+.actions-panel,
+.status-modal__card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-soft);
+}
+
+.app-shell__header,
+.app-shell__footer,
+.screen {
+  padding: 1.25rem;
+}
+
+.app-shell__header {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.app-shell__eyebrow,
+.screen-header__eyebrow,
+.app-shell__status,
+.screen__hint,
+.pet-name__subtitle,
+.pet-option__species,
+.pet-option__summary,
+.pet-card__description {
+  color: var(--color-text-muted);
+}
+
+.app-shell__eyebrow,
+.screen-header__eyebrow {
+  margin: 0 0 0.35rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.app-shell__title,
+.screen-header__title {
+  margin: 0;
+  line-height: 1.1;
+}
+
+.app-shell__title {
+  font-size: clamp(2rem, 6vw, 3.4rem);
+}
+
+.app-shell__status,
+.app-shell__footer p,
+.screen__hint,
+.screen-header__subtitle,
+.pet-option__description,
+.pet-card__description,
+.pet-card__status,
+.action-button__description {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.app-shell__main {
+  flex: 1;
   display: flex;
-  border-top: 1px solid var(--border);
-  text-align: left;
-
-  & > div {
-    flex: 1 1 0;
-    padding: 32px;
-    @media (max-width: 1024px) {
-      padding: 24px 20px;
-    }
-  }
-
-  .icon {
-    margin-bottom: 16px;
-    width: 22px;
-    height: 22px;
-  }
-
-  @media (max-width: 1024px) {
-    flex-direction: column;
-    text-align: center;
-  }
 }
 
-#docs {
-  border-right: 1px solid var(--border);
-
-  @media (max-width: 1024px) {
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-  }
-}
-
-#next-steps ul {
-  list-style: none;
-  padding: 0;
-  display: flex;
-  gap: 8px;
-  margin: 32px 0 0;
-
-  .logo {
-    height: 18px;
-  }
-
-  a {
-    color: var(--text-h);
-    font-size: 16px;
-    border-radius: 6px;
-    background: var(--social-bg);
-    display: flex;
-    padding: 6px 12px;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
-    transition: box-shadow 0.3s;
-
-    &:hover {
-      box-shadow: var(--shadow);
-    }
-    .button-icon {
-      height: 18px;
-      width: 18px;
-    }
-  }
-
-  @media (max-width: 1024px) {
-    margin-top: 20px;
-    flex-wrap: wrap;
-    justify-content: center;
-
-    li {
-      flex: 1 1 calc(50% - 8px);
-    }
-
-    a {
-      width: 100%;
-      justify-content: center;
-      box-sizing: border-box;
-    }
-  }
-}
-
-#spacer {
-  height: 88px;
-  border-top: 1px solid var(--border);
-  @media (max-width: 1024px) {
-    height: 48px;
-  }
-}
-
-.ticks {
-  position: relative;
+.screen {
   width: 100%;
+  display: grid;
+  gap: 1.25rem;
+}
 
-  &::before,
-  &::after {
-    content: '';
-    position: absolute;
-    top: -4.5px;
-    border: 5px solid transparent;
+.screen__actions {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.screen-header {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.screen-header__subtitle {
+  margin: 0;
+  max-width: 38rem;
+}
+
+.pet-selection-list {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.pet-option,
+.action-button,
+.primary-button,
+.secondary-button {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease;
+}
+
+.pet-option,
+.action-button {
+  width: 100%;
+  padding: 1rem;
+  background: var(--color-surface-muted);
+  text-align: left;
+}
+
+.pet-option {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1rem;
+  align-items: center;
+}
+
+.pet-option__content,
+.pet-option__header {
+  display: grid;
+}
+
+.pet-option__content {
+  gap: 0.45rem;
+}
+
+.pet-option__header {
+  gap: 0.1rem;
+}
+
+.pet-option__name,
+.action-button__label,
+.pet-name__title {
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.pet-option__summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+}
+
+.pet-option--selected {
+  border-color: var(--color-accent-dark);
+  background: rgba(122, 127, 140, 0.14);
+}
+
+.pet-card {
+  padding: 1rem;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1rem;
+  align-items: center;
+}
+
+.pet-card__body {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.pet-card__status {
+  color: var(--color-accent-dark);
+  font-weight: 600;
+}
+
+.pet-card__heading {
+  display: flex;
+  gap: 0.75rem;
+  align-items: start;
+  justify-content: space-between;
+}
+
+.pet-name {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.pet-name__title {
+  font-size: 1.2rem;
+}
+
+.pet-avatar {
+  width: 5.5rem;
+  height: 5.5rem;
+  border-radius: 1.5rem;
+  overflow: hidden;
+  flex-shrink: 0;
+  background:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.9), transparent 55%),
+    linear-gradient(135deg, #d6dae0, #eef1f5);
+  border: 1px solid var(--color-border);
+  display: inline-grid;
+  place-items: center;
+}
+
+.pet-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pet-avatar__fallback {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--color-accent-dark);
+}
+
+.pet-card__mood {
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.pet-card__mood--happy {
+  background: rgba(76, 217, 123, 0.16);
+  color: #1f7a41;
+}
+
+.pet-card__mood--hungry {
+  background: rgba(255, 179, 71, 0.2);
+  color: #9a6200;
+}
+
+.pet-card__mood--sleepy {
+  background: rgba(90, 200, 250, 0.18);
+  color: #035e82;
+}
+
+.pet-card__mood--sick {
+  background: rgba(122, 127, 140, 0.18);
+  color: #4e5562;
+}
+
+.stats-panel,
+.actions-panel {
+  padding: 1rem;
+}
+
+.stats-panel {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.stat-bar {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.stat-bar__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.95rem;
+}
+
+.stat-bar__track {
+  width: 100%;
+  height: 0.8rem;
+  border-radius: 999px;
+  background: rgba(122, 127, 140, 0.14);
+  overflow: hidden;
+}
+
+.stat-bar__fill {
+  height: 100%;
+  border-radius: inherit;
+  transition: width 240ms ease;
+}
+
+.stat-bar--food .stat-bar__fill {
+  background: var(--color-food);
+}
+
+.stat-bar--health .stat-bar__fill {
+  background: var(--color-health);
+}
+
+.stat-bar--happiness .stat-bar__fill {
+  background: var(--color-happiness);
+}
+
+.stat-bar--energy .stat-bar__fill {
+  background: var(--color-energy);
+}
+
+.stat-bar[data-low='true'] .stat-bar__track {
+  box-shadow: 0 0 0 1px rgba(177, 49, 49, 0.18);
+}
+
+.actions-panel {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.action-button {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.primary-button,
+.secondary-button {
+  padding: 0.95rem 1.2rem;
+  font-weight: 700;
+}
+
+.primary-button {
+  background: var(--color-accent-dark);
+  color: #ffffff;
+}
+
+.primary-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.action-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+  transform: none;
+  box-shadow: none;
+}
+
+.secondary-button {
+  background: transparent;
+  color: var(--color-text);
+}
+
+.secondary-button--danger {
+  border-color: rgba(177, 49, 49, 0.28);
+  color: #9a2b2b;
+}
+
+.home-screen__toolbar {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.app-shell__footer {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.status-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(18, 24, 38, 0.45);
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+.status-modal__card {
+  width: min(100%, 28rem);
+  padding: 1.25rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.status-modal__card h2 {
+  margin: 0;
+}
+
+.status-modal__card p {
+  margin: 0;
+}
+
+.pet-option:hover,
+.action-button:hover,
+.primary-button:hover,
+.secondary-button:hover {
+  transform: translateY(-1px);
+  border-color: var(--color-accent-dark);
+  box-shadow: 0 10px 24px rgba(17, 24, 39, 0.12);
+}
+
+.pet-option:active,
+.action-button:active,
+.primary-button:active,
+.secondary-button:active {
+  transform: translateY(0);
+}
+
+.pet-option:focus-visible,
+.action-button:focus-visible,
+.primary-button:focus-visible,
+.secondary-button:focus-visible {
+  outline: 3px solid rgba(90, 200, 250, 0.45);
+  outline-offset: 2px;
+}
+
+@media (min-width: 720px) {
+  .app-shell {
+    max-width: 72rem;
+    margin: 0 auto;
+    padding: 1.5rem;
   }
 
-  &::before {
-    left: 0;
-    border-left-color: var(--border);
+  .app-shell__header {
+    grid-template-columns: 1fr auto;
+    align-items: end;
   }
-  &::after {
-    right: 0;
-    border-right-color: var(--border);
+
+  .pet-selection-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .actions-panel {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .home-screen__toolbar,
+  .screen__actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: center;
+  }
+
+  .screen__hint {
+    text-align: right;
   }
 }

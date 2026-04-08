@@ -1,4 +1,5 @@
 import type { Pet } from '../types'
+import PetOptionCard from './PetOptionCard'
 
 type PetSelectionListProps = {
   pets: Pet[]
@@ -6,9 +7,23 @@ type PetSelectionListProps = {
   onSelect: (petId: string) => void
 }
 
-function PetSelectionList(props: PetSelectionListProps) {
-  void props
-  return null
+function PetSelectionList({
+  pets,
+  selectedPetId,
+  onSelect,
+}: PetSelectionListProps) {
+  return (
+    <div className="pet-selection-list">
+      {pets.map((pet) => (
+        <PetOptionCard
+          key={pet.id}
+          pet={pet}
+          isSelected={pet.id === selectedPetId}
+          onSelect={onSelect}
+        />
+      ))}
+    </div>
+  )
 }
 
 export default PetSelectionList
