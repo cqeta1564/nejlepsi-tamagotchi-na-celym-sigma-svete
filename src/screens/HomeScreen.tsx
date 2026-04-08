@@ -1,50 +1,35 @@
-import ActionsPanel from '../components/ActionsPanel'
-import PetCard from '../components/PetCard'
-import ScreenHeader from '../components/ScreenHeader'
+import RoomStage from '../components/RoomStage'
 import StatsPanel from '../components/StatsPanel'
-import type { Pet, PetAction } from '../types'
+import type { Pet, PetAction, Room } from '../types'
 
 type HomeScreenProps = {
   pet: Pet
-  actions: PetAction[]
+  room: Room
+  roomAction: PetAction
   onActionClick: (actionId: PetAction['id']) => void
+  onPreviousRoom: () => void
+  onNextRoom: () => void
   onChangePet: () => void
   onResetGame: () => void
 }
 
-const MOOD_COPY = {
-  happy: 've forme a pripraveny na dalsi dobrodruzstvi.',
-  hungry: 'hladovy a potrebuje nakrmit.',
-  sleepy: 'ospaly a chce si dat pauzu.',
-  sick: 'slaby a potrebuje peci.',
-} as const
-
 function HomeScreen({
   pet,
-  actions,
+  room,
+  roomAction,
   onActionClick,
+  onPreviousRoom,
+  onNextRoom,
   onChangePet,
   onResetGame,
 }: HomeScreenProps) {
   return (
-    <section className="screen">
-      <ScreenHeader
-        title={`Ahoj, ${pet.name}`}
-        subtitle={`${pet.species} je ted ${MOOD_COPY[pet.mood]} ${pet.statusMessage}`}
-      />
-
-      <PetCard pet={pet} />
-      <StatsPanel stats={pet.stats} />
-      <ActionsPanel
-        actions={actions}
-        disabled={!pet.alive}
-        onActionClick={onActionClick}
-      />
-
-      <div className="home-screen__toolbar">
-        <button type="button" className="secondary-button" onClick={onChangePet}>
-          Zmenit mazlicka
-        </button>
+    <section className="screen screen--home">
+      <div className="home-screen__topbar">
+        <div>
+          <p className="screen-header__eyebrow">Webove tamagotchi</p>
+          <h2 className="screen-header__title">{pet.name}</h2>
+        </div>
         <button
           type="button"
           className="secondary-button secondary-button--danger"
@@ -52,6 +37,24 @@ function HomeScreen({
         >
           Nova hra
         </button>
+      </div>
+
+      <StatsPanel stats={pet.stats} />
+
+      <RoomStage
+        pet={pet}
+        room={room}
+        action={roomAction}
+        onActionClick={onActionClick}
+        onPreviousRoom={onPreviousRoom}
+        onNextRoom={onNextRoom}
+      />
+
+      <div className="home-screen__toolbar">
+        <button type="button" className="secondary-button" onClick={onChangePet}>
+          Zmenit mazlicka
+        </button>
+        <p className="home-screen__hint">{pet.species} je s tebou v mistnosti {room.name}.</p>
       </div>
     </section>
   )

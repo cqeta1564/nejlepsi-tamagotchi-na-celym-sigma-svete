@@ -15,6 +15,7 @@ import {
   STORAGE_KEY,
   TICK_INTERVAL_MS,
   createInitialGameState,
+  getCurrentRoom,
   gameReducer,
   getSelectedPet,
   sanitizeGameState,
@@ -30,7 +31,10 @@ function App() {
   const [isStorageErrorDismissed, setIsStorageErrorDismissed] = useState(false)
 
   const selectedPet = getSelectedPet(state)
+  const currentRoom = getCurrentRoom(state)
   const selectedPetIsAlive = selectedPet !== null && selectedPet.alive
+  const currentRoomAction =
+    petActions.find((action) => action.id === currentRoom.actionId) ?? petActions[0]
 
   useEffect(() => {
     setStoredState(state)
@@ -90,6 +94,14 @@ function App() {
     })
   }
 
+  const handlePreviousRoom = () => {
+    dispatch({ type: 'previousRoom' })
+  }
+
+  const handleNextRoom = () => {
+    dispatch({ type: 'nextRoom' })
+  }
+
   const handleResetGame = () => {
     const shouldReset = window.confirm(
       'Opravdu chces smazat ulozeny postup a zacit novou hru?',
@@ -117,7 +129,7 @@ function App() {
     selectedPet !== null &&
     !selectedPetIsAlive
       ? {
-          title: `${selectedPet.name} potrebuje novy start`,
+          title: 'Mazlicek zemrel!!!',
           message:
             'Zdravi kleslo na nulu. Po zavreni dialogu spustime novou hru od vyberu mazlicka.',
         }
@@ -139,6 +151,11 @@ function App() {
   const storageMessage = storageMeta.didLoadFromStorage
     ? 'Ulozeny stav byl obnoven.'
     : 'Nova hra je pripravena.'
+  const storageMessageTone = storageMeta.error
+    ? 'error'
+    : storageMeta.didLoadFromStorage
+      ? 'success'
+      : 'loading'
 
   return (
     <div className="app-shell">
@@ -147,15 +164,20 @@ function App() {
           <p className="app-shell__eyebrow">Sigma tamagotchi</p>
           <h1 className="app-shell__title">Nejlepsi tamagotchi na celym sigma svete</h1>
         </div>
-        <p className="app-shell__status">{storageMessage}</p>
+        <p className={`app-shell__status app-shell__status--${storageMessageTone}`}>
+          {storageMessage}
+        </p>
       </header>
 
       <main className="app-shell__main">
         {state.currentScreen === 'home' && selectedPet !== null ? (
           <HomeScreen
             pet={selectedPet}
-            actions={petActions}
+            room={currentRoom}
+            roomAction={currentRoomAction}
             onActionClick={handleActionClick}
+            onPreviousRoom={handlePreviousRoom}
+            onNextRoom={handleNextRoom}
             onChangePet={handleChangePet}
             onResetGame={handleResetGame}
           />

@@ -1,4 +1,5 @@
 import { mockPets } from '../data/pets'
+import { rooms } from '../data/rooms'
 import type {
   GameState,
   Pet,
@@ -17,6 +18,7 @@ export const TICK_INTERVAL_MS = 5000
 const MIN_STAT = 0
 const LOW_STAT_THRESHOLD = 24
 const DEFAULT_SELECTED_PET_ID = mockPets[0]?.id ?? null
+const DEFAULT_ROOM_INDEX = 0
 
 const BASE_DECAY: Record<'food' | 'happiness' | 'energy', number> = {
   food: 6,
@@ -34,6 +36,12 @@ export type GameAction =
     }
   | {
       type: 'returnToSelection'
+    }
+  | {
+      type: 'previousRoom'
+    }
+  | {
+      type: 'nextRoom'
     }
   | {
       type: 'performAction'
@@ -54,6 +62,7 @@ export function createInitialGameState(): GameState {
   return {
     currentScreen: 'selection',
     selectedPetId: DEFAULT_SELECTED_PET_ID,
+    currentRoomIndex: DEFAULT_ROOM_INDEX,
     pets: mockPets.map((pet) => normalizePet(pet, pet)),
   }
 }
@@ -75,10 +84,12 @@ export function sanitizeGameState(input: GameState): GameState {
     input?.currentScreen === 'home' && selectedPetId !== null
       ? 'home'
       : 'selection'
+  const currentRoomIndex = normalizeRoomIndex(input?.currentRoomIndex)
 
   return {
     currentScreen,
     selectedPetId,
+    currentRoomIndex,
     pets,
   }
 }
@@ -111,6 +122,18 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         currentScreen: 'selection',
       }
 
+    case 'previousRoom':
+      return {
+        ...state,
+        currentRoomIndex: getWrappedRoomIndex(state.currentRoomIndex - 1),
+      }
+
+    case 'nextRoom':
+      return {
+        ...state,
+        currentRoomIndex: getWrappedRoomIndex(state.currentRoomIndex + 1),
+      }
+
     case 'performAction':
       return updateSelectedPet(state, (pet) =>
         pet.stats.health > MIN_STAT ? applyActionToPet(pet, action.action) : pet,
@@ -139,6 +162,10 @@ export function getSelectedPet(state: GameState) {
 
 export function isPetAlive(pet: Pet | null): pet is Pet {
   return Boolean(pet?.alive)
+}
+
+export function getCurrentRoom(state: GameState) {
+  return rooms[state.currentRoomIndex] ?? rooms[DEFAULT_ROOM_INDEX]
 }
 
 function updateSelectedPet(
@@ -343,4 +370,18 @@ function deriveStatusMessage(status: PetStatus, stats: PetStats) {
 
 function clampStat(value: number) {
   return clampPercentage(value)
+}
+
+function normalizeRoomIndex(value: unknown) {
+  if (typeof value !== 'number' || !Number.isFinite(value)) {
+    return DEFAULT_ROOM_INDEX
+  }
+
+  return getWrappedRoomIndex(Math.round(value))
+}
+
+function getWrappedRoomIndex(index: number) {
+  const roomCount = rooms.length
+
+  return ((index % roomCount) + roomCount) % roomCount
 }
