@@ -5,6 +5,8 @@ type RoomStageProps = {
   pet: Pet
   room: Room
   action: PetAction
+  isActionAvailable?: boolean
+  canChangeRoom?: boolean
   onActionClick: (actionId: PetAction['id']) => void
   onPreviousRoom: () => void
   onNextRoom: () => void
@@ -14,6 +16,8 @@ function RoomStage({
   pet,
   room,
   action,
+  isActionAvailable = true,
+  canChangeRoom = true,
   onActionClick,
   onPreviousRoom,
   onNextRoom,
@@ -43,14 +47,15 @@ function RoomStage({
           className="room-stage__arrow"
           onClick={onPreviousRoom}
           aria-label="Predchozi mistnost"
+          disabled={!canChangeRoom}
         >
-          ←
+          &larr;
         </button>
         <button
           type="button"
           className="primary-button room-stage__action"
           onClick={() => onActionClick(action.id)}
-          disabled={!pet.alive}
+          disabled={!pet.alive || !isActionAvailable}
         >
           {action.label}
         </button>
@@ -59,8 +64,9 @@ function RoomStage({
           className="room-stage__arrow"
           onClick={onNextRoom}
           aria-label="Dalsi mistnost"
+          disabled={!canChangeRoom}
         >
-          →
+          &rarr;
         </button>
       </div>
     </section>

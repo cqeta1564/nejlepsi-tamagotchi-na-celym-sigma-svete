@@ -9,6 +9,7 @@ import type {
   PetStatKey,
   PetStats,
   PetStatus,
+  Room,
 } from '../types'
 import { clampPercentage } from '../utils/stats'
 
@@ -19,6 +20,12 @@ const MIN_STAT = 0
 const LOW_STAT_THRESHOLD = 24
 const DEFAULT_SELECTED_PET_ID = mockPets[0]?.id ?? null
 const DEFAULT_ROOM_INDEX = 0
+const FALLBACK_ROOM = {
+  id: 'kitchen',
+  name: 'Zakladni mistnost',
+  description: 'Mistnosti se nepodarilo nacist, proto jsme zapnuli bezpecny fallback.',
+  actionId: 'feed',
+} satisfies Room
 
 const BASE_DECAY: Record<'food' | 'happiness' | 'energy', number> = {
   food: 6,
@@ -67,8 +74,11 @@ export function createInitialGameState(): GameState {
   }
 }
 
-export function sanitizeGameState(input: GameState): GameState {
-  const persistedPets = Array.isArray(input?.pets) ? input.pets : []
+export function sanitizeGameState(input: unknown): GameState {
+  const persistedState = isObject(input) ? input : null
+  const persistedPets = Array.isArray(persistedState?.pets)
+    ? persistedState.pets
+    : []
 
   const pets = mockPets.map((fallbackPet) => {
     const persistedPet = persistedPets.find((pet) => pet?.id === fallbackPet.id)
@@ -76,15 +86,19 @@ export function sanitizeGameState(input: GameState): GameState {
     return normalizePet(persistedPet, fallbackPet)
   })
 
-  const selectedPetId = pets.some((pet) => pet.id === input?.selectedPetId)
-    ? input.selectedPetId
-    : DEFAULT_SELECTED_PET_ID
+  const selectedPetId =
+    typeof persistedState?.selectedPetId === 'string' &&
+    pets.some((pet) => pet.id === persistedState.selectedPetId)
+      ? persistedState.selectedPetId
+      : DEFAULT_SELECTED_PET_ID
 
   const currentScreen =
-    input?.currentScreen === 'home' && selectedPetId !== null
+    persistedState?.currentScreen === 'home' &&
+    selectedPetId !== null &&
+    selectedPetId === persistedState.selectedPetId
       ? 'home'
       : 'selection'
-  const currentRoomIndex = normalizeRoomIndex(input?.currentRoomIndex)
+  const currentRoomIndex = normalizeRoomIndex(persistedState?.currentRoomIndex)
 
   return {
     currentScreen,
@@ -165,7 +179,7 @@ export function isPetAlive(pet: Pet | null): pet is Pet {
 }
 
 export function getCurrentRoom(state: GameState) {
-  return rooms[state.currentRoomIndex] ?? rooms[DEFAULT_ROOM_INDEX]
+  return rooms[state.currentRoomIndex] ?? rooms[DEFAULT_ROOM_INDEX] ?? FALLBACK_ROOM
 }
 
 function updateSelectedPet(
@@ -232,15 +246,11 @@ function normalizePet(pet: PartialPet | undefined, fallbackPet: PetSeed): Pet {
   const derivedState = derivePetState(stats)
 
   return {
-    id: typeof pet?.id === 'string' ? pet.id : fallbackPet.id,
-    name: typeof pet?.name === 'string' ? pet.name : fallbackPet.name,
-    species:
-      typeof pet?.species === 'string' ? pet.species : fallbackPet.species,
-    description:
-      typeof pet?.description === 'string'
-        ? pet.description
-        : fallbackPet.description,
-    image: typeof pet?.image === 'string' ? pet.image : fallbackPet.image,
+    id: fallbackPet.id,
+    name: normalizeText(pet?.name, fallbackPet.name),
+    species: normalizeText(pet?.species, fallbackPet.species),
+    description: normalizeText(pet?.description, fallbackPet.description),
+    image: normalizeText(pet?.image, fallbackPet.image),
     stats,
     ...derivedState,
   }
@@ -373,6 +383,10 @@ function clampStat(value: number) {
 }
 
 function normalizeRoomIndex(value: unknown) {
+  if (rooms.length === 0) {
+    return DEFAULT_ROOM_INDEX
+  }
+
   if (typeof value !== 'number' || !Number.isFinite(value)) {
     return DEFAULT_ROOM_INDEX
   }
@@ -383,5 +397,23 @@ function normalizeRoomIndex(value: unknown) {
 function getWrappedRoomIndex(index: number) {
   const roomCount = rooms.length
 
+  if (roomCount === 0) {
+    return DEFAULT_ROOM_INDEX
+  }
+
   return ((index % roomCount) + roomCount) % roomCount
+}
+
+function normalizeText(value: unknown, fallbackValue: string) {
+  if (typeof value !== 'string') {
+    return fallbackValue
+  }
+
+  const trimmedValue = value.trim()
+
+  return trimmedValue.length > 0 ? trimmedValue : fallbackValue
+}
+
+function isObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
 }
