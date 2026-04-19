@@ -7,13 +7,9 @@ type PetSelectionListProps = {
   onSelect: (petId: string) => void
 }
 
-function PetSelectionList({
-  pets,
-  selectedPetId,
-  onSelect,
-}: PetSelectionListProps) {
+function PetSelectionList({ pets, selectedPetId, onSelect }: PetSelectionListProps) {
   return (
-    <div className="pet-selection-list">
+    <div className="pet-grid">
       {pets.map((pet) => (
         <PetOptionCard
           key={pet.id}

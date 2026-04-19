@@ -1,34 +1,80 @@
-import ActionsPanel from '../components/ActionsPanel'
 import PetCard from '../components/PetCard'
-import ScreenHeader from '../components/ScreenHeader'
 import StatsPanel from '../components/StatsPanel'
-import type { Pet, PetAction } from '../types'
+import type { Pet } from '../types'
 
 type HomeScreenProps = {
   pet: Pet
-  actions: PetAction[]
-  onActionClick: (actionId: PetAction['id']) => void
+  roomId: 'kitchen' | 'store' | 'park' | 'casino'
+  roomName: string
+  roomImageLabel: string
+  roomDescription: string
+  roomBackgroundImage: string
+  actionIcon: string
+  actionLabel: string
+  actionCost: number
+  coins: number
+  statusText: string
+  onPrevRoom: () => void
+  onNextRoom: () => void
+  onRoomAction: () => void
+  onRestartRequest: () => void
+  isPetDead: boolean
+  isActionDisabled: boolean
 }
 
-function HomeScreen({ pet, actions, onActionClick }: HomeScreenProps) {
+function HomeScreen({
+  pet,
+  roomId,
+  roomName,
+  roomImageLabel,
+  roomDescription,
+  roomBackgroundImage,
+  actionIcon,
+  actionLabel,
+  actionCost,
+  coins,
+  statusText,
+  onPrevRoom,
+  onNextRoom,
+  onRoomAction,
+  onRestartRequest,
+  isPetDead,
+  isActionDisabled,
+}: HomeScreenProps) {
   return (
-    <section className="screen screen--home">
-      <ScreenHeader
-        title={`${pet.name} je pripraven na dalsi den`}
-        subtitle={`Sleduj potreby mazlicka ${pet.species.toLowerCase()}, reaguj na zmeny nalady a udrz statistiky v bezpecnych hodnotach.`}
-      />
-
-      <div className="screen-grid">
-        <div className="screen-grid__primary">
-          <PetCard pet={pet} />
-          <ActionsPanel actions={actions} onActionClick={onActionClick} />
-        </div>
-
-        <aside className="screen-grid__secondary">
-          <StatsPanel stats={pet.stats} />
-        </aside>
+    <div className="wire-screen wire-screen--game">
+      <div className="top-bar">
+        <div className="top-bar__spacer" />
+        <button
+          type="button"
+          className="wire-button wire-button--small wire-button--primary"
+          onClick={onRestartRequest}
+        >
+          nova hra
+        </button>
       </div>
-    </section>
+
+      <StatsPanel stats={pet.stats} />
+
+      <PetCard
+        pet={pet}
+        roomId={roomId}
+        roomName={roomName}
+        roomImageLabel={roomImageLabel}
+        roomDescription={roomDescription}
+        roomBackgroundImage={roomBackgroundImage}
+        actionIcon={actionIcon}
+        actionLabel={actionLabel}
+        actionCost={actionCost}
+        coins={coins}
+        statusText={statusText}
+        onPrevRoom={onPrevRoom}
+        onNextRoom={onNextRoom}
+        onRoomAction={onRoomAction}
+        isActionDisabled={isActionDisabled}
+        isPetDead={isPetDead}
+      />
+    </div>
   )
 }
 

@@ -1,5 +1,4 @@
 import PetSelectionList from '../components/PetSelectionList'
-import ScreenHeader from '../components/ScreenHeader'
 import SelectPetButton from '../components/SelectPetButton'
 import type { Pet } from '../types'
 
@@ -17,11 +16,9 @@ function PetSelectionScreen({
   onConfirmSelection,
 }: PetSelectionScreenProps) {
   return (
-    <section className="screen screen--selection">
-      <ScreenHeader
-        title="Vyber si mazlicka pro novou hru"
-        subtitle="Kazdy mazlicek ma jinou naladu i vychozi statistiky. Zacni s tim, ktery ti sedi nejvic."
-      />
+    <div className="wire-screen wire-screen--selection">
+      <p className="wire-title">Webove tamagotchi</p>
+      <h1>1. Vyber si sveho mazlicka</h1>
 
       <PetSelectionList
         pets={pets}
@@ -29,13 +26,11 @@ function PetSelectionScreen({
         onSelect={onSelectPet}
       />
 
-      <div className="selection-actions">
-        <SelectPetButton
-          disabled={!selectedPetId}
-          onClick={onConfirmSelection}
-        />
-      </div>
-    </section>
+      <SelectPetButton
+        disabled={!selectedPetId}
+        onClick={onConfirmSelection}
+      />
+    </div>
   )
 }
 

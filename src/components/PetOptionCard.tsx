@@ -11,20 +11,12 @@ function PetOptionCard({ pet, isSelected, onSelect }: PetOptionCardProps) {
   return (
     <button
       type="button"
-      className={`pet-option-card${isSelected ? ' pet-option-card--selected' : ''}`}
+      className={`pet-choice${isSelected ? ' pet-choice--selected' : ''}`}
       onClick={() => onSelect(pet.id)}
+      aria-pressed={isSelected}
     >
-      <span className="pet-option-card__check" aria-hidden="true">
-        {isSelected ? 'OK' : ''}
-      </span>
-
-      <PetAvatar src={pet.image} alt={pet.species} />
-
-      <span className="pet-option-card__content">
-        <strong>{pet.name}</strong>
-        <span className="pet-option-card__species">{pet.species}</span>
-        <span className="pet-option-card__description">{pet.description}</span>
-      </span>
+      <PetAvatar src={pet.image} alt={pet.name} />
+      <span className="pet-choice__name">{pet.name}</span>
     </button>
   )
 }

@@ -7,11 +7,11 @@ function SelectPetButton({ disabled, onClick }: SelectPetButtonProps) {
   return (
     <button
       type="button"
-      className="primary-button"
+      className="wire-button wire-button--confirm wire-button--primary"
       disabled={disabled}
       onClick={onClick}
     >
-      Zacit hru s vybranym mazlickem
+      potvrdit vyber
     </button>
   )
 }

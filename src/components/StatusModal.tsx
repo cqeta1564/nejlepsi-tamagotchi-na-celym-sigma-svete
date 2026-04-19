@@ -2,34 +2,36 @@ type StatusModalProps = {
   isOpen: boolean
   title: string
   message: string
+  variant?: 'info' | 'restart' | 'dead'
   onClose: () => void
+  onConfirm?: () => void
 }
 
 function StatusModal({
   isOpen,
   title,
   message,
+  variant = 'info',
   onClose,
+  onConfirm,
 }: StatusModalProps) {
   if (!isOpen) {
     return null
   }
 
-  return (
-    <div className="modal-backdrop" role="presentation" onClick={onClose}>
-      <div
-        className="status-modal"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="status-modal-title"
-        onClick={(event) => event.stopPropagation()}
-      >
-        <p className="status-modal__eyebrow">Systemova zprava</p>
-        <h2 id="status-modal-title">{title}</h2>
-        <p className="status-modal__message">{message}</p>
+  const buttonLabel = variant === 'info' ? 'zavrit' : 'Zacit znovu'
 
-        <button type="button" className="primary-button" onClick={onClose}>
-          Rozumim
+  return (
+    <div className="modal-overlay" role="presentation" onClick={onClose}>
+      <div className="wire-modal" role="dialog" aria-modal="true" onClick={(event) => event.stopPropagation()}>
+        <p className="wire-modal__title">{title}</p>
+        {message ? <p className="wire-modal__message">{message}</p> : null}
+        <button
+          type="button"
+          className="wire-button wire-button--modal wire-button--primary"
+          onClick={onConfirm ?? onClose}
+        >
+          {buttonLabel}
         </button>
       </div>
     </div>

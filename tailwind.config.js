@@ -3,24 +3,24 @@ const config = {
   theme: {
     extend: {
       colors: {
-        primary: '#7A7F8C',
-        background: '#F2F3F5',
-        surface: '#E6E8EB',
-        border: '#C9CDD3',
+        primary: '#AAA9B4',
+        background: '#EEF1F4',
+        surface: '#F7F8FA',
+        border: '#CFD5DD',
         text: {
           primary: '#000000',
-          secondary: '#9E9BBB',
+          secondary: '#6D7582',
         },
         status: {
-          loading: '#7EA9C7',
+          loading: '#AAA9B4',
           error: '#C77E7E',
-          success: '#7EBF9B',
+          success: '#4CD97B',
         },
         stats: {
-          hunger: '#C9A06A',
-          health: '#7EBF9B',
-          energy: '#7EA9C7',
-          happiness: '#C9BE6A',
+          hunger: '#FFB347',
+          health: '#4CD97B',
+          energy: '#5AC8FA',
+          happiness: '#FFD93D',
         },
       },
     },

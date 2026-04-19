@@ -1,14 +1,79 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
-import PetSelectionScreen from './screens/PetSelectionScreen'
 import HomeScreen from './screens/HomeScreen'
+import PetSelectionScreen from './screens/PetSelectionScreen'
 import StatusModal from './components/StatusModal'
-import { petActions } from './data/actions'
+import itemAutomatImage from './assets/item-automat.png'
+import itemKafeCigoImage from './assets/item-kafe-cigo.png'
+import itemMonsterImage from './assets/item-monster.png'
+import itemParkDangerImage from './assets/item-park-danger.svg'
+import roomCasinoImage from './assets/room-casino.png'
+import roomKitchenImage from './assets/room-kitchen.png'
+import roomParkImage from './assets/room-park.png'
+import roomStoreImage from './assets/room-store.png'
 import { mockPets } from './data/pets'
 import { COLORS } from './theme'
-import type { GameState, Pet, PetAction, PetMood, PetStats } from './types'
+import type { GameState, PetMood, PetStats } from './types'
 
-const STORAGE_KEY = 'tamagotchi-mvp-state'
+const STORAGE_KEY = 'tamagotchi-wireframe-state'
+const STAT_DECAY_INTERVAL_MS = 12000
+const COIN_REGEN_INTERVAL_MS = 5000
+
+type RoomId = 'kitchen' | 'store' | 'park' | 'casino'
+
+type Room = {
+  id: RoomId
+  name: string
+  actionLabel: string
+  actionCost: number
+  imageLabel: string
+  description: string
+  backgroundImage: string
+  actionIcon: string
+}
+
+const rooms: Room[] = [
+  {
+    id: 'kitchen',
+    name: 'Kuchyn',
+    actionLabel: 'Kafe s cigem',
+    actionCost: 8,
+    imageLabel: 'Kuchyn',
+    description: 'Doplni hlad a trosku probere energii.',
+    backgroundImage: roomKitchenImage,
+    actionIcon: itemKafeCigoImage,
+  },
+  {
+    id: 'store',
+    name: 'Vecerka',
+    actionLabel: 'Bily monster',
+    actionCost: 10,
+    imageLabel: 'Vecerka',
+    description: 'Doplni energii, ale nestoji malo.',
+    backgroundImage: roomStoreImage,
+    actionIcon: itemMonsterImage,
+  },
+  {
+    id: 'park',
+    name: 'Park na hlavnim nadrazi',
+    actionLabel: 'Dat si piko',
+    actionCost: 12,
+    imageLabel: 'Park',
+    description: 'Zvedne zdravi a trochu naladu.',
+    backgroundImage: roomParkImage,
+    actionIcon: itemParkDangerImage,
+  },
+  {
+    id: 'casino',
+    name: 'Kasino',
+    actionLabel: 'Zatocit automatem',
+    actionCost: 15,
+    imageLabel: 'Kasino',
+    description: 'Doplni stesti a muzes vyhrat nebo prohrat penize.',
+    backgroundImage: roomCasinoImage,
+    actionIcon: itemAutomatImage,
+  },
+]
 
 const initialGameState: GameState = {
   currentScreen: 'selection',
@@ -16,118 +81,169 @@ const initialGameState: GameState = {
   pets: mockPets,
 }
 
-type AppTone = 'loading' | 'success' | 'error'
-
-type AppStatus = {
-  tone: AppTone
-  message: string
+type PersistedState = {
+  gameState: GameState
+  roomIndex: number
+  coins: number
+  statusText: string
 }
 
-type ModalState = {
-  isOpen: boolean
-  title: string
-  message: string
-}
-
-const themeVariables = {
-  '--color-primary': COLORS.primary,
-  '--color-background': COLORS.background,
-  '--color-surface': COLORS.surface,
-  '--color-border': COLORS.border,
-  '--color-text-primary': COLORS.text.primary,
-  '--color-text-secondary': COLORS.text.secondary,
-  '--color-status-loading': COLORS.status.loading,
-  '--color-status-error': COLORS.status.error,
-  '--color-status-success': COLORS.status.success,
-  '--color-stat-hunger': COLORS.stats.hunger,
-  '--color-stat-health': COLORS.stats.health,
-  '--color-stat-energy': COLORS.stats.energy,
-  '--color-stat-happiness': COLORS.stats.happiness,
-} as CSSProperties
+type ModalState =
+  | {
+      isOpen: false
+      kind: 'restart'
+      title: string
+      message: string
+    }
+  | {
+      isOpen: true
+      kind: 'restart' | 'dead'
+      title: string
+      message: string
+    }
 
 function App() {
   const [gameState, setGameState] = useState<GameState>(initialGameState)
-  const [isHydrated, setIsHydrated] = useState(false)
-  const [appStatus, setAppStatus] = useState<AppStatus>({
-    tone: 'loading',
-    message: 'Pripravuji tvuj virtualni domecek.',
-  })
+  const [roomIndex, setRoomIndex] = useState(0)
+  const [coins, setCoins] = useState(24)
+  const [statusText, setStatusText] = useState('Vyber mistnost a proved cinnost.')
+  const [isHydrating, setIsHydrating] = useState(true)
+  const [storageError, setStorageError] = useState(false)
   const [modalState, setModalState] = useState<ModalState>({
     isOpen: false,
+    kind: 'restart',
     title: '',
     message: '',
   })
+  const hasDeathModalOpenRef = useRef(false)
 
-  const selectedPet =
-    gameState.pets.find((pet) => pet.id === gameState.selectedPetId) ?? null
+  const selectedPet = useMemo(
+    () => gameState.pets.find((pet) => pet.id === gameState.selectedPetId) ?? null,
+    [gameState.pets, gameState.selectedPetId],
+  )
+
+  const currentRoom = rooms[roomIndex]
+  const isPetDead = selectedPet ? hasAnyZeroStat(selectedPet.stats) : false
+  const cannotAffordAction = coins < currentRoom.actionCost
 
   useEffect(() => {
     try {
-      const storedValue = window.localStorage.getItem(STORAGE_KEY)
+      const rawValue = window.localStorage.getItem(STORAGE_KEY)
 
-      if (!storedValue) {
-        setAppStatus({
-          tone: 'success',
-          message: 'Nova hra je pripravena. Vyber si mazlicka.',
-        })
-        setIsHydrated(true)
+      if (!rawValue) {
         return
       }
 
-      const parsedValue = JSON.parse(storedValue)
+      const parsedValue = JSON.parse(rawValue) as Partial<PersistedState>
 
-      if (!isGameState(parsedValue)) {
-        throw new Error('Neplatny tvar ulozenych dat.')
+      if (!isPersistedState(parsedValue)) {
+        throw new Error('Invalid stored state')
       }
 
-      setGameState(parsedValue)
-      setAppStatus({
-        tone: 'success',
-        message: 'Ulozeny stav jsme uspesne obnovili.',
-      })
+      setGameState(parsedValue.gameState)
+      setRoomIndex(parsedValue.roomIndex)
+      setCoins(parsedValue.coins)
+      setStatusText(parsedValue.statusText)
     } catch (error) {
       console.error(error)
-      setGameState(initialGameState)
-      setAppStatus({
-        tone: 'error',
-        message: 'Ulozeny stav se nepodarilo nacist.',
-      })
-      setModalState({
-        isOpen: true,
-        title: 'Data se nepodarilo obnovit',
-        message:
-          'Spoustime cistou hru. Rozbite nebo zastarale ulozene hodnoty jsme ignorovali, aby aplikace zustala pouzitelna.',
-      })
+      setStorageError(true)
     } finally {
-      setIsHydrated(true)
+      setIsHydrating(false)
     }
   }, [])
 
   useEffect(() => {
-    if (!isHydrated) {
+    if (isHydrating) {
       return
     }
 
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(gameState))
-    } catch (error) {
-      console.error(error)
-      setAppStatus({
-        tone: 'error',
-        message: 'Zmeny se nepodarilo ulozit do prohlizece.',
-      })
+    const payload: PersistedState = {
+      gameState,
+      roomIndex,
+      coins,
+      statusText,
     }
-  }, [gameState, isHydrated])
+
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(payload))
+  }, [coins, gameState, isHydrating, roomIndex, statusText])
+
+  useEffect(() => {
+    if (isHydrating || gameState.currentScreen !== 'home' || !selectedPet) {
+      return
+    }
+
+    const intervalId = window.setInterval(() => {
+      setGameState((currentState) => {
+        const currentPet = currentState.pets.find(
+          (pet) => pet.id === currentState.selectedPetId,
+        )
+
+        if (!currentPet || hasAnyZeroStat(currentPet.stats)) {
+          return currentState
+        }
+
+        const decayedStats = {
+          food: clampStat(currentPet.stats.food - 4),
+          health: clampStat(currentPet.stats.health - 2),
+          happiness: clampStat(currentPet.stats.happiness - 3),
+          energy: clampStat(currentPet.stats.energy - 5),
+        }
+
+        const nextPets = currentState.pets.map((pet) =>
+          pet.id === currentPet.id
+            ? {
+                ...pet,
+                stats: decayedStats,
+                mood: getMoodFromStats(decayedStats),
+              }
+            : pet,
+        )
+
+        return {
+          ...currentState,
+          pets: nextPets,
+        }
+      })
+
+      setStatusText('Staty se postupne zmensuji. Nenech mazlicka spadnout na nulu.')
+    }, STAT_DECAY_INTERVAL_MS)
+
+    return () => window.clearInterval(intervalId)
+  }, [gameState.currentScreen, isHydrating, selectedPet])
+
+  useEffect(() => {
+    if (isHydrating || gameState.currentScreen !== 'home' || !selectedPet || isPetDead) {
+      return
+    }
+
+    const intervalId = window.setInterval(() => {
+      setCoins((currentCoins) => currentCoins + 1)
+    }, COIN_REGEN_INTERVAL_MS)
+
+    return () => window.clearInterval(intervalId)
+  }, [gameState.currentScreen, isHydrating, isPetDead, selectedPet])
+
+  useEffect(() => {
+    if (!selectedPet || !hasAnyZeroStat(selectedPet.stats) || hasDeathModalOpenRef.current) {
+      return
+    }
+
+    hasDeathModalOpenRef.current = true
+    setStatusText(`${selectedPet.name} uz to nezvladl. Musis zacit novou hru.`)
+    setModalState({
+      isOpen: true,
+      kind: 'dead',
+      title: 'Mazlicek zemrel!!',
+      message: 'Stat neklesl vcas. Zacni novou hru.',
+    })
+  }, [selectedPet])
 
   function handleSelectPet(petId: string) {
     setGameState((currentState) => ({
       ...currentState,
       selectedPetId: petId,
     }))
-    setAppStatus({
-      tone: 'success',
-      message: 'Mazlicek je pripraveny ke startu.',
-    })
+    setStatusText('Mazlicek je vybrany. Potvrd vyber a muzes zacit hru.')
   }
 
   function handleConfirmSelection() {
@@ -135,195 +251,268 @@ function App() {
       return
     }
 
-    const confirmedPet =
-      gameState.pets.find((pet) => pet.id === gameState.selectedPetId) ?? null
-
+    hasDeathModalOpenRef.current = false
     setGameState((currentState) => ({
       ...currentState,
       currentScreen: 'home',
     }))
-    setAppStatus({
-      tone: 'success',
-      message: 'Dobrodruzstvi zacina. Stav se uklada automaticky.',
-    })
-
-    if (confirmedPet) {
-      setModalState({
-        isOpen: true,
-        title: `Vitej, ${confirmedPet.name}!`,
-        message:
-          'Mazlicek je pripraveny na prvni akce. Sleduj statistiky a reaguj driv, nez budou padat do cervenych hodnot.',
-      })
-    }
+    setRoomIndex(0)
+    setCoins(24)
+    setStatusText('Kuchyn je pripravena. Zacni prvni akci a udrzuj staty nad nulou.')
   }
 
-  function handleChangePet() {
-    setGameState((currentState) => ({
-      ...currentState,
-      currentScreen: 'selection',
-    }))
-    setAppStatus({
-      tone: 'loading',
-      message: 'Muzes zvolit jineho mazlicka.',
-    })
+  function handlePrevRoom() {
+    setRoomIndex((currentValue) =>
+      currentValue === 0 ? rooms.length - 1 : currentValue - 1,
+    )
   }
 
-  function handleResetGame() {
-    window.localStorage.removeItem(STORAGE_KEY)
-    setGameState(initialGameState)
-    setAppStatus({
-      tone: 'success',
-      message: 'Nova hra je pripravena od zacatku.',
-    })
-    setModalState({
-      isOpen: true,
-      title: 'Nova hra',
-      message:
-        'Predchozi ulozeny postup jsme smazali. Vyber si mazlicka a muzes zacit znovu.',
-    })
+  function handleNextRoom() {
+    setRoomIndex((currentValue) =>
+      currentValue === rooms.length - 1 ? 0 : currentValue + 1,
+    )
   }
 
-  function handleActionClick(actionId: PetAction['id']) {
-    if (!selectedPet) {
+  function handleRoomAction() {
+    if (!selectedPet || hasAnyZeroStat(selectedPet.stats)) {
       return
     }
 
-    const action = petActions.find((item) => item.id === actionId)
-
-    if (!action) {
+    if (coins < currentRoom.actionCost) {
+      setStatusText(`Na ${currentRoom.actionLabel.toLowerCase()} potrebujes ${currentRoom.actionCost} penez.`)
       return
     }
 
-    const updatedPets = gameState.pets.map((pet) => {
-      if (pet.id !== selectedPet.id) {
-        return pet
-      }
+    const result = executeRoomAction(currentRoom.id, selectedPet.stats, coins)
 
-      const nextStats = applyActionToStats(pet.stats, action.effects)
-
-      return {
-        ...pet,
-        stats: nextStats,
-        mood: getMoodFromStats(nextStats),
-      }
-    })
-
-    const updatedPet =
-      updatedPets.find((pet) => pet.id === selectedPet.id) ?? selectedPet
+    const updatedPets = gameState.pets.map((pet) =>
+      pet.id === selectedPet.id
+        ? {
+            ...pet,
+            stats: result.stats,
+            mood: getMoodFromStats(result.stats),
+          }
+        : pet,
+    )
 
     setGameState((currentState) => ({
       ...currentState,
       pets: updatedPets,
     }))
+    setCoins(result.coins)
+    setStatusText(result.message)
+  }
 
-    setAppStatus({
-      tone: 'success',
-      message: `${action.label} probehlo uspesne.`,
-    })
+  function handleRequestRestart() {
     setModalState({
       isOpen: true,
-      title: `${updatedPet.name} reaguje na akci`,
-      message: getActionFeedback(updatedPet, action.label),
+      kind: 'restart',
+      title: 'Vazne chcete zacit od znova?',
+      message: 'Smaze se ulozeny postup i penize.',
     })
   }
 
-  function closeModal() {
-    setModalState((currentState) => ({
-      ...currentState,
+  function handleCloseModal() {
+    if (modalState.kind === 'dead') {
+      return
+    }
+
+    setModalState({
       isOpen: false,
-    }))
+      kind: 'restart',
+      title: '',
+      message: '',
+    })
+  }
+
+  function handleRestartGame() {
+    window.localStorage.removeItem(STORAGE_KEY)
+    hasDeathModalOpenRef.current = false
+    setGameState(initialGameState)
+    setRoomIndex(0)
+    setCoins(24)
+    setStatusText('Vyber noveho mazlicka a zacni znovu.')
+    setModalState({
+      isOpen: false,
+      kind: 'restart',
+      title: '',
+      message: '',
+    })
+  }
+
+  if (isHydrating) {
+    return (
+      <main className="app-page">
+        <section className="phone-shell system-screen">
+          <h1>Systemovy stav</h1>
+          <div className="system-card">
+            <div className="system-card__icon system-card__icon--loading" />
+            <p>Nacitam ulozeny stav</p>
+          </div>
+        </section>
+      </main>
+    )
+  }
+
+  if (storageError) {
+    return (
+      <main className="app-page">
+        <section className="phone-shell system-screen">
+          <h1>Systemovy stav</h1>
+          <div className="system-card">
+            <div className="system-card__icon system-card__icon--error">X</div>
+            <p>Nepodarilo se nacist data</p>
+          </div>
+          <button type="button" className="wire-button wire-button--primary" onClick={handleRestartGame}>
+            Zacit znovu
+          </button>
+        </section>
+      </main>
+    )
   }
 
   return (
-    <div className="app-shell" style={themeVariables}>
-      <div className="app-shell__backdrop" aria-hidden="true" />
-
-      <div className="app-layout">
-        <header className="app-header">
-          <div>
-            <p className="app-header__eyebrow">Virtualni Tamagotchi</p>
-            <h1>Pece o digitalniho partaka v prohlizeci</h1>
-            <p className="app-header__intro">
-              Minimalni verze hry s vyberem mazlicka, statistikami, akcemi a
-              automatickym ukladanim do local storage.
-            </p>
-          </div>
-
-          <div className="app-header__meta">
-            <span className={`status-pill status-pill--${appStatus.tone}`}>
-              {appStatus.message}
-            </span>
-
-            {gameState.currentScreen === 'home' ? (
-              <button
-                type="button"
-                className="secondary-button"
-                onClick={handleChangePet}
-              >
-                Zmenit mazlicka
-              </button>
-            ) : null}
-          </div>
+    <main
+      className="app-page"
+      style={
+        {
+          '--color-primary': COLORS.primary,
+          '--color-background': COLORS.background,
+          '--color-surface': COLORS.surface,
+          '--color-border': COLORS.border,
+          '--color-text-primary': COLORS.text.primary,
+          '--color-text-secondary': COLORS.text.secondary,
+          '--color-stat-hunger': COLORS.stats.hunger,
+          '--color-stat-health': COLORS.stats.health,
+          '--color-stat-energy': COLORS.stats.energy,
+          '--color-stat-happiness': COLORS.stats.happiness,
+        } as CSSProperties
+      }
+    >
+      <section className="phone-shell">
+        <header className="app-shell-header">
+          <p className="app-shell-header__eyebrow">Virtualni Tamagotchi</p>
+          <h1 className="app-shell-header__title">Mobile-first sigma pet care</h1>
         </header>
 
-        <main className="app-main">
-          {gameState.currentScreen === 'selection' ? (
+        <main className="app-shell-main">
+          {gameState.currentScreen === 'selection' || !selectedPet ? (
             <PetSelectionScreen
               pets={gameState.pets}
               selectedPetId={gameState.selectedPetId}
               onSelectPet={handleSelectPet}
               onConfirmSelection={handleConfirmSelection}
-            />
-          ) : selectedPet ? (
-            <HomeScreen
-              pet={selectedPet}
-              actions={petActions}
-              onActionClick={handleActionClick}
             />
           ) : (
-            <PetSelectionScreen
-              pets={gameState.pets}
-              selectedPetId={gameState.selectedPetId}
-              onSelectPet={handleSelectPet}
-              onConfirmSelection={handleConfirmSelection}
+            <HomeScreen
+              pet={selectedPet}
+              roomId={currentRoom.id}
+              roomName={currentRoom.name}
+              roomImageLabel={currentRoom.imageLabel}
+              roomDescription={currentRoom.description}
+              roomBackgroundImage={currentRoom.backgroundImage}
+              actionIcon={currentRoom.actionIcon}
+              actionLabel={currentRoom.actionLabel}
+              actionCost={currentRoom.actionCost}
+              coins={coins}
+              statusText={statusText}
+              onPrevRoom={handlePrevRoom}
+              onNextRoom={handleNextRoom}
+              onRoomAction={handleRoomAction}
+              onRestartRequest={handleRequestRestart}
+              isPetDead={isPetDead}
+              isActionDisabled={isPetDead || cannotAffordAction}
             />
           )}
         </main>
 
-        <footer className="app-footer">
-          <p>
-            Stav mazlicka se uklada po kazde akci. U layoutu je pripraveny
-            mobile-first zaklad pro dalsi rozsireni obrazovek.
-          </p>
-
-          <button
-            type="button"
-            className="ghost-button"
-            onClick={handleResetGame}
-          >
-            Nova hra
-          </button>
+        <footer className="app-shell-footer">
+          <p>{gameState.currentScreen === 'home' ? 'Ukladani probiha automaticky.' : 'Vyber mazlicka a zacni hru.'}</p>
         </footer>
-      </div>
+      </section>
 
       <StatusModal
         isOpen={modalState.isOpen}
         title={modalState.title}
         message={modalState.message}
-        onClose={closeModal}
+        variant={modalState.kind}
+        onClose={handleCloseModal}
+        onConfirm={handleRestartGame}
       />
-    </div>
+    </main>
   )
 }
 
-type StatEffects = Partial<Record<keyof PetStats, number>>
+function executeRoomAction(roomId: RoomId, stats: PetStats, currentCoins: number) {
+  const paidCoins = Math.max(0, currentCoins - rooms.find((room) => room.id === roomId)!.actionCost)
 
-function applyActionToStats(stats: PetStats, effects: StatEffects): PetStats {
+  if (roomId === 'kitchen') {
+    const nextStats = {
+      food: clampStat(stats.food + 28),
+      health: clampStat(stats.health - 2),
+      happiness: clampStat(stats.happiness + 2),
+      energy: clampStat(stats.energy + 6),
+    }
+
+    return {
+      stats: nextStats,
+      coins: paidCoins,
+      message: 'Kafe s cigem doplnilo hlad. Je to sice trochu cursed, ale zabralo to.',
+    }
+  }
+
+  if (roomId === 'store') {
+    const nextStats = {
+      food: clampStat(stats.food - 2),
+      health: clampStat(stats.health - 1),
+      happiness: clampStat(stats.happiness + 4),
+      energy: clampStat(stats.energy + 30),
+    }
+
+    return {
+      stats: nextStats,
+      coins: paidCoins,
+      message: 'Bily monster nakopl energii. Mazlicek ted vypada podstatne vic vzhuru.',
+    }
+  }
+
+  if (roomId === 'park') {
+    const nextStats = {
+      food: clampStat(stats.food - 4),
+      health: clampStat(stats.health + 24),
+      happiness: clampStat(stats.happiness + 8),
+      energy: clampStat(stats.energy - 5),
+    }
+
+    return {
+      stats: nextStats,
+      coins: paidCoins,
+      message: 'Piko v parku na hlavnim nadrazi zvedlo zdravi. Ano, tenhle mazlicek je fakt sigma projekt.',
+    }
+  }
+
+  const jackpotRoll = Math.random()
+  const coinsDelta =
+    jackpotRoll > 0.82 ? 35 : jackpotRoll > 0.52 ? 10 : jackpotRoll > 0.24 ? 0 : -8
+  const nextStats = {
+    food: clampStat(stats.food - 3),
+    health: clampStat(stats.health - 2),
+    happiness: clampStat(stats.happiness + 26),
+    energy: clampStat(stats.energy - 4),
+  }
+  const nextCoins = Math.max(0, paidCoins + coinsDelta)
+
   return {
-    food: clampStat(stats.food + (effects.food ?? 0)),
-    health: clampStat(stats.health + (effects.health ?? 0)),
-    happiness: clampStat(stats.happiness + (effects.happiness ?? 0)),
-    energy: clampStat(stats.energy + (effects.energy ?? 0)),
+    stats: nextStats,
+    coins: nextCoins,
+    message:
+      coinsDelta > 10
+        ? 'Automat se urval a trefil jackpot. Stesti vyletelo nahoru a penize taky.'
+        : coinsDelta > 0
+          ? 'Automat doplnil stesti a neco malo vysypal i do penezenky.'
+          : coinsDelta === 0
+            ? 'Stesti slo nahoru, ale penezenka zustala skoro beze zmeny.'
+            : 'Stesti se sice zvedlo, ale automat cast penez sezral.',
   }
 }
 
@@ -332,11 +521,11 @@ function clampStat(value: number) {
 }
 
 function getMoodFromStats(stats: PetStats): PetMood {
-  if (stats.health <= 35) {
+  if (stats.health <= 25 || stats.energy <= 20) {
     return 'sick'
   }
 
-  if (stats.energy <= 35) {
+  if (stats.energy <= 40) {
     return 'sleepy'
   }
 
@@ -347,73 +536,20 @@ function getMoodFromStats(stats: PetStats): PetMood {
   return 'happy'
 }
 
-function getActionFeedback(pet: Pet, actionLabel: string) {
-  const moodMessages: Record<PetMood, string> = {
-    happy: `${pet.name} vypada spokojene. Akce "${actionLabel}" zafungovala presne podle planu.`,
-    hungry: `${pet.name} se uklidnil, ale stale by ocenil dalsi peci kolem jidla.`,
-    sleepy: `${pet.name} ziskal trochu klidu. Energie je stale dulezita, tak ji sleduj dal.`,
-    sick: `${pet.name} potrebuje jemne tempo a dalsi peci. Zdravi je ted nejvyssi priorita.`,
-  }
-
-  return moodMessages[pet.mood]
+function hasAnyZeroStat(stats: PetStats) {
+  return Object.values(stats).some((value) => value <= 0)
 }
 
-function isGameState(value: unknown): value is GameState {
-  if (!value || typeof value !== 'object') {
-    return false
-  }
-
-  const candidate = value as Partial<GameState>
-
-  return (
-    (candidate.currentScreen === 'selection' ||
-      candidate.currentScreen === 'home') &&
-    (candidate.selectedPetId === null ||
-      typeof candidate.selectedPetId === 'string') &&
-    Array.isArray(candidate.pets) &&
-    candidate.pets.every(isPet)
-  )
-}
-
-function isPet(value: unknown): value is Pet {
-  if (!value || typeof value !== 'object') {
-    return false
-  }
-
-  const candidate = value as Partial<Pet>
-
-  return (
-    typeof candidate.id === 'string' &&
-    typeof candidate.name === 'string' &&
-    typeof candidate.species === 'string' &&
-    typeof candidate.description === 'string' &&
-    typeof candidate.image === 'string' &&
-    isPetMood(candidate.mood) &&
-    isPetStats(candidate.stats)
-  )
-}
-
-function isPetMood(value: unknown): value is PetMood {
-  return (
-    value === 'happy' ||
-    value === 'hungry' ||
-    value === 'sleepy' ||
-    value === 'sick'
-  )
-}
-
-function isPetStats(value: unknown): value is PetStats {
-  if (!value || typeof value !== 'object') {
-    return false
-  }
-
-  const candidate = value as Partial<PetStats>
-
-  return (
-    typeof candidate.food === 'number' &&
-    typeof candidate.health === 'number' &&
-    typeof candidate.happiness === 'number' &&
-    typeof candidate.energy === 'number'
+function isPersistedState(
+  value: Partial<PersistedState> | null | undefined,
+): value is PersistedState {
+  return Boolean(
+    value &&
+      typeof value.roomIndex === 'number' &&
+      typeof value.coins === 'number' &&
+      typeof value.statusText === 'string' &&
+      value.gameState &&
+      Array.isArray(value.gameState.pets),
   )
 }
 
