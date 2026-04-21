@@ -1,29 +1,29 @@
+import type { ReactNode } from 'react'
 import { useState } from 'react'
+import CutoutImage from './CutoutImage'
 
 type PetAvatarProps = {
   src: string
   alt: string
+  children?: ReactNode
 }
 
-function PetAvatar({ src, alt }: PetAvatarProps) {
-  const [failedSrc, setFailedSrc] = useState<string | null>(null)
-  const fallbackLabel = alt.trim().charAt(0).toUpperCase() || '?'
-  const showFallback = !src || failedSrc === src
+function PetAvatar({ src, alt, children }: PetAvatarProps) {
+  const [hasError, setHasError] = useState(false)
+  const fallback = alt.slice(0, 1).toUpperCase()
 
   return (
-    <span className="pet-avatar">
-      {showFallback ? (
-        <span className="pet-avatar__fallback" aria-hidden="true">
-          {fallbackLabel}
-        </span>
-      ) : (
-        <img
+    <span className="avatar-circle" aria-label={alt}>
+      {!hasError ? (
+        <CutoutImage
           src={src}
-          alt={alt}
-          loading="lazy"
-          onError={() => setFailedSrc(src)}
+          alt=""
+          className="avatar-circle__image"
+          onError={() => setHasError(true)}
         />
-      )}
+      ) : null}
+      {children}
+      {hasError ? <span className="avatar-circle__fallback">{fallback}</span> : null}
     </span>
   )
 }

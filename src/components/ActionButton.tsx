@@ -2,20 +2,31 @@ import type { PetAction } from '../types'
 
 type ActionButtonProps = {
   action: PetAction
-  disabled?: boolean
   onClick: (actionId: PetAction['id']) => void
 }
 
-function ActionButton({ action, disabled = false, onClick }: ActionButtonProps) {
+const actionIcons: Record<PetAction['id'], string> = {
+  feed: 'FOOD',
+  heal: 'HEAL',
+  play: 'PLAY',
+  sleep: 'REST',
+}
+
+function ActionButton({ action, onClick }: ActionButtonProps) {
   return (
     <button
       type="button"
       className="action-button"
-      disabled={disabled}
       onClick={() => onClick(action.id)}
     >
-      <span className="action-button__label">{action.label}</span>
-      <span className="action-button__description">{action.description}</span>
+      <span className="action-button__icon" aria-hidden="true">
+        {actionIcons[action.id]}
+      </span>
+
+      <span className="action-button__content">
+        <strong>{action.label}</strong>
+        <span>{action.description}</span>
+      </span>
     </button>
   )
 }
