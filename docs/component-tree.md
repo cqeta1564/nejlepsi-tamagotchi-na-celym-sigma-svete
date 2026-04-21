@@ -1,26 +1,28 @@
 # Component tree
 
-Role B component split for the Tamagotchi MVP:
+Current render tree for the Tamagotchi MVP:
 
 ```text
 App
 |- StatusModal
 |- PetSelectionScreen
-|  |- ScreenHeader
+|  |- screen heading (inline in PetSelectionScreen)
 |  |- PetSelectionList
 |  |  |- PetOptionCard
 |  |  |  |- PetAvatar
 |  |- SelectPetButton
 |- HomeScreen
 |  |- StatsPanel
-|  |  |- StatBar
-|  |- RoomStage
+|  |  |- StatChip
+|  |- PetCard
+|  |  |- CutoutImage
 |  |  |- PetAvatar
+|  |  |  |- PetFace
 ```
 
 State and data ownership:
 
-- `App` owns the game reducer, interval tick, screen transitions and persistence.
-- `src/state/game.ts` contains reducer actions and Tamagotchi game rules.
-- `src/data/pets.ts` and `src/data/actions.ts` provide sample data for the UI.
+- `App` owns the game state, interval ticks, screen transitions and persistence.
+- Room actions are defined inline in `src/App.tsx` together with their game effects.
+- `src/data/pets.ts` provides sample pet data for the UI.
 - Presentational components receive typed props and stay focused on rendering.
