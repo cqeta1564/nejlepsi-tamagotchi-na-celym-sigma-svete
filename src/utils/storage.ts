@@ -1,6 +1,7 @@
 export type LocalStorageMeta = {
   didLoadFromStorage: boolean
-  error: string | null
+  loadError: boolean
+  saveError: boolean
 }
 
 type StoredSnapshot<T> = {
@@ -25,7 +26,8 @@ export function loadFromLocalStorage<T>(
       value: fallbackValue,
       meta: {
         didLoadFromStorage: false,
-        error: null,
+        loadError: false,
+        saveError: false,
       },
     }
   }
@@ -38,7 +40,8 @@ export function loadFromLocalStorage<T>(
         value: fallbackValue,
         meta: {
           didLoadFromStorage: false,
-          error: null,
+          loadError: false,
+          saveError: false,
         },
       }
     }
@@ -47,7 +50,8 @@ export function loadFromLocalStorage<T>(
       value: JSON.parse(storedValue) as T,
       meta: {
         didLoadFromStorage: true,
-        error: null,
+        loadError: false,
+        saveError: false,
       },
     }
   } catch {
@@ -55,7 +59,8 @@ export function loadFromLocalStorage<T>(
       value: fallbackValue,
       meta: {
         didLoadFromStorage: false,
-        error: 'load',
+        loadError: true,
+        saveError: false,
       },
     }
   }
@@ -63,12 +68,13 @@ export function loadFromLocalStorage<T>(
 
 export function saveToLocalStorage<T>(key: string, value: T) {
   if (typeof window === 'undefined') {
-    return
+    return true
   }
 
   try {
     window.localStorage.setItem(key, JSON.stringify(value))
+    return true
   } catch {
-    // Ignore quota and privacy-mode write errors and keep the app interactive.
+    return false
   }
 }

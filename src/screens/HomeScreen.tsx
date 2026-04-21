@@ -6,6 +6,8 @@ type HomeScreenProps = {
   pet: Pet
   room: Room
   roomAction: PetAction
+  isRoomActionAvailable?: boolean
+  canChangeRoom?: boolean
   onActionClick: (actionId: PetAction['id']) => void
   onPreviousRoom: () => void
   onNextRoom: () => void
@@ -17,6 +19,8 @@ function HomeScreen({
   pet,
   room,
   roomAction,
+  isRoomActionAvailable = true,
+  canChangeRoom = true,
   onActionClick,
   onPreviousRoom,
   onNextRoom,
@@ -45,6 +49,8 @@ function HomeScreen({
         pet={pet}
         room={room}
         action={roomAction}
+        isActionAvailable={isRoomActionAvailable}
+        canChangeRoom={canChangeRoom}
         onActionClick={onActionClick}
         onPreviousRoom={onPreviousRoom}
         onNextRoom={onNextRoom}
@@ -54,7 +60,11 @@ function HomeScreen({
         <button type="button" className="secondary-button" onClick={onChangePet}>
           Zmenit mazlicka
         </button>
-        <p className="home-screen__hint">{pet.species} je s tebou v mistnosti {room.name}.</p>
+        <p className="home-screen__hint">
+          {isRoomActionAvailable
+            ? `${pet.species} je s tebou v mistnosti ${room.name}.`
+            : `${room.name} je nactena ve fallback rezimu, proto je akce docasne vypnuta.`}
+        </p>
       </div>
     </section>
   )

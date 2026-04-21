@@ -16,13 +16,18 @@ function PetSelectionScreen({
   onSelectPet,
   onConfirmSelection,
 }: PetSelectionScreenProps) {
+  const hasPets = pets.length > 0
   const selectedPet = pets.find((pet) => pet.id === selectedPetId)
 
   return (
     <section className="screen">
       <ScreenHeader
         title="1. Vyber si sveho mazlicka"
-        subtitle="Vyber se ulozi automaticky a hru spustis jednim tlacitkem."
+        subtitle={
+          hasPets
+            ? 'Vyber se ulozi automaticky a hru spustis jednim tlacitkem.'
+            : 'Bez dat mazlicku nejde hru spustit, ale aplikace zustava funkcni.'
+        }
       />
 
       <PetSelectionList
@@ -33,12 +38,14 @@ function PetSelectionScreen({
 
       <div className="screen__actions">
         <SelectPetButton
-          disabled={selectedPetId === null}
+          disabled={selectedPetId === null || !hasPets}
           onClick={onConfirmSelection}
         />
         <p className="screen__hint">
-          {selectedPet
-            ? `${selectedPet.name} je pripraveny na start.`
+          {!hasPets
+            ? 'Nejsou k dispozici zadni mazlicci.'
+            : selectedPet
+              ? `${selectedPet.name} je pripraveny na start.`
             : 'Nejdriv vyber jednoho mazlicka.'}
         </p>
       </div>

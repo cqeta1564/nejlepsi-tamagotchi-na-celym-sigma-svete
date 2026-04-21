@@ -1,4 +1,4 @@
-import { useEffect, useState, type Dispatch, type SetStateAction } from 'react'
+import { useState, type Dispatch, type SetStateAction } from 'react'
 import {
   loadFromLocalStorage,
   saveToLocalStorage,
@@ -9,12 +9,32 @@ export function useLocalStorage<T>(
   key: string,
   initialValue: T | (() => T),
 ): [T, Dispatch<SetStateAction<T>>, LocalStorageMeta] {
-  const [snapshot] = useState(() => loadFromLocalStorage(key, initialValue))
-  const [value, setValue] = useState<T>(snapshot.value)
+  const [state, setState] = useState(() => loadFromLocalStorage(key, initialValue))
 
-  useEffect(() => {
-    saveToLocalStorage(key, value)
-  }, [key, value])
+  const setValue: Dispatch<SetStateAction<T>> = (nextValue) => {
+    setState((currentState) => {
+      const value =
+        typeof nextValue === 'function'
+          ? (nextValue as (previousValue: T) => T)(currentState.value)
+          : nextValue
+      const didSave = saveToLocalStorage(key, value)
 
-  return [value, setValue, snapshot.meta]
+      if (
+        Object.is(currentState.value, value) &&
+        currentState.meta.saveError === !didSave
+      ) {
+        return currentState
+      }
+
+      return {
+        value,
+        meta: {
+          ...currentState.meta,
+          saveError: !didSave,
+        },
+      }
+    })
+  }
+
+  return [state.value, setValue, state.meta]
 }

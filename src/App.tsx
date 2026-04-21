@@ -8,6 +8,7 @@ import {
 import './App.css'
 import StatusModal from './components/StatusModal'
 import { petActions } from './data/actions'
+import { rooms } from './data/rooms'
 import { useLocalStorage } from './hooks/useLocalStorage'
 import HomeScreen from './screens/HomeScreen'
 import PetSelectionScreen from './screens/PetSelectionScreen'
@@ -22,23 +23,41 @@ import {
 } from './state/game'
 import type { PetAction } from './types'
 
+const FALLBACK_ROOM_ACTION: PetAction = {
+  id: 'feed',
+  label: 'Akce neni dostupna',
+  description: 'Pro tuto mistnost chybi navazana akce, takze je docasne vypnuta.',
+  effects: {},
+}
+
 function App() {
   const [storedState, setStoredState, storageMeta] = useLocalStorage(
     STORAGE_KEY,
     createInitialGameState,
   )
   const [state, dispatch] = useReducer(gameReducer, storedState, sanitizeGameState)
-  const [isStorageErrorDismissed, setIsStorageErrorDismissed] = useState(false)
+  const [dismissedStorageError, setDismissedStorageError] = useState<
+    'load' | 'save' | null
+  >(null)
 
   const selectedPet = getSelectedPet(state)
   const currentRoom = getCurrentRoom(state)
   const selectedPetIsAlive = selectedPet !== null && selectedPet.alive
-  const currentRoomAction =
-    petActions.find((action) => action.id === currentRoom.actionId) ?? petActions[0]
+  const currentRoomAction = petActions.find(
+    (action) => action.id === currentRoom.actionId,
+  )
+  const isRoomActionAvailable = currentRoomAction !== undefined
+  const canChangeRoom = rooms.length > 1
 
   useEffect(() => {
     setStoredState(state)
   }, [setStoredState, state])
+
+  const activeStorageError = storageMeta.saveError
+    ? 'save'
+    : storageMeta.loadError
+      ? 'load'
+      : null
 
   const handleTick = useEffectEvent(() => {
     dispatch({ type: 'tick' })
@@ -117,11 +136,17 @@ function App() {
   }
 
   const storageErrorModal =
-    storageMeta.error === 'load' && !isStorageErrorDismissed
-      ? {
-          title: 'Nepodarilo se obnovit ulozenou hru',
-          message: 'Pokracujeme s novou hrou a vychozim stavem.',
-        }
+    activeStorageError !== null && dismissedStorageError !== activeStorageError
+      ? activeStorageError === 'save'
+        ? {
+            title: 'Ukladani je momentalne blokovane',
+            message:
+              'Prohlizec nepovolil zapis do localStorage. Hra bezi dal, ale po refreshi se postup nemusi obnovit.',
+          }
+        : {
+            title: 'Nepodarilo se obnovit ulozenou hru',
+            message: 'Pokracujeme s novou hrou a vychozim stavem.',
+          }
       : null
 
   const deadPetModal =
@@ -145,13 +170,19 @@ function App() {
       return
     }
 
-    setIsStorageErrorDismissed(true)
+    if (activeStorageError !== null) {
+      setDismissedStorageError(activeStorageError)
+    }
   }
 
-  const storageMessage = storageMeta.didLoadFromStorage
-    ? 'Ulozeny stav byl obnoven.'
-    : 'Nova hra je pripravena.'
-  const storageMessageTone = storageMeta.error
+  const storageMessage = storageMeta.saveError
+    ? 'Ukladani se nepodarilo. Postup se po refreshi nemusi obnovit.'
+    : storageMeta.loadError
+      ? 'Ulozeny stav nesel nacist. Pokracujeme od zacatku.'
+      : storageMeta.didLoadFromStorage
+        ? 'Ulozeny stav byl obnoven.'
+        : 'Nova hra je pripravena.'
+  const storageMessageTone = storageMeta.loadError || storageMeta.saveError
     ? 'error'
     : storageMeta.didLoadFromStorage
       ? 'success'
@@ -174,7 +205,9 @@ function App() {
           <HomeScreen
             pet={selectedPet}
             room={currentRoom}
-            roomAction={currentRoomAction}
+            roomAction={currentRoomAction ?? FALLBACK_ROOM_ACTION}
+            isRoomActionAvailable={isRoomActionAvailable}
+            canChangeRoom={canChangeRoom}
             onActionClick={handleActionClick}
             onPreviousRoom={handlePreviousRoom}
             onNextRoom={handleNextRoom}
@@ -194,8 +227,10 @@ function App() {
       <footer className="app-shell__footer">
         <p>Staty se zhorsuji kazdych {TICK_INTERVAL_MS / 1000} sekund a hra se uklada automaticky.</p>
         <p>
-          {state.currentScreen === 'home' && selectedPet !== null
-            ? `Aktivni mazlicek: ${selectedPet.name}. ${selectedPet.statusMessage}`
+          {storageMeta.saveError
+            ? 'Ukladani je vypnute, proto si pred refreshem hlidej, ze o postup muzes prijit.'
+            : state.currentScreen === 'home' && selectedPet !== null
+              ? `Aktivni mazlicek: ${selectedPet.name}. ${selectedPet.statusMessage}`
             : 'Vyber si mazlicka a spust hru.'}
         </p>
       </footer>
