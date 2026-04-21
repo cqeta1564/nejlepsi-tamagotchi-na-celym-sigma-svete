@@ -70,11 +70,22 @@ img {
   isolation: isolate;
 }
 
+.app-page--home {
+  padding: 8px 8px 10px;
+}
+
 .phone-shell {
   width: min(100%, 390px);
   min-height: 100svh;
   padding: 8px 2px 0;
   background: transparent;
+  display: flex;
+  flex-direction: column;
+}
+
+.phone-shell--home {
+  min-height: calc(100svh - 18px);
+  padding-top: 2px;
 }
 
 .app-shell-header,
@@ -100,6 +111,28 @@ img {
 
 .app-shell-main {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-shell-main--home {
+  min-height: 0;
+}
+
+.phone-shell--home .app-shell-header {
+  padding: 2px 8px 4px;
+}
+
+.phone-shell--home .app-shell-header__eyebrow {
+  font-size: 0.62rem;
+}
+
+.phone-shell--home .app-shell-header__title {
+  font-size: 0.88rem;
+}
+
+.phone-shell--home .app-shell-footer {
+  display: none;
 }
 
 .app-shell-footer {
@@ -283,6 +316,8 @@ img {
 }
 
 .wire-screen--game {
+  flex: 1;
+  min-height: 0;
   padding: 2px 4px 0;
 }
 
@@ -291,6 +326,15 @@ img {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 12px;
+}
+
+.phone-shell--home .wire-screen--game {
+  gap: 8px;
+  padding: 0 2px;
+}
+
+.phone-shell--home .top-bar {
+  margin-bottom: 6px;
 }
 
 .top-bar__spacer {
@@ -312,6 +356,11 @@ img {
   margin-bottom: 14px;
 }
 
+.phone-shell--home .stats-row {
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
 .stat-chip {
   position: relative;
   display: flex;
@@ -327,6 +376,21 @@ img {
   box-shadow: 0 10px 18px rgba(91, 107, 134, 0.07);
   backdrop-filter: blur(10px);
   overflow: hidden;
+}
+
+.phone-shell--home .stat-chip {
+  min-height: 54px;
+  padding: 4px 3px;
+  border-radius: 16px;
+}
+
+.phone-shell--home .stat-chip__label {
+  font-size: 0.62rem;
+}
+
+.phone-shell--home .stat-chip__value {
+  margin-top: 3px;
+  font-size: 0.86rem;
 }
 
 .stat-chip__fill {
@@ -391,6 +455,12 @@ img {
   isolation: isolate;
 }
 
+.phone-shell--home .room-card {
+  min-height: 0;
+  padding: 10px;
+  border-radius: 26px;
+}
+
 .room-card::before {
   content: "";
   position: absolute;
@@ -406,25 +476,35 @@ img {
   z-index: 1;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   margin-bottom: 16px;
-  padding: 8px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.9);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.9);
-  color: #40516a;
-  font-size: 0.92rem;
-  font-weight: 700;
-  box-shadow: 0 10px 22px rgba(36, 48, 71, 0.12);
-  backdrop-filter: blur(10px);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #243754;
+  font-size: 1.3rem;
+  font-weight: 900;
+  text-shadow:
+    0 2px 8px rgba(255, 255, 255, 0.95),
+    0 0 18px rgba(255, 255, 255, 0.75);
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.phone-shell--home .room-card__money {
+  margin-bottom: 8px;
+  padding: 0;
+  font-size: 1.2rem;
 }
 
 .money-dot {
-  width: 22px;
-  height: 22px;
-  border: 2px solid rgba(207, 213, 221, 0.98);
-  border-radius: 999px;
-  background: #ffffff;
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  filter:
+    drop-shadow(0 6px 12px rgba(199, 138, 22, 0.22))
+    drop-shadow(0 0 10px rgba(255, 245, 181, 0.6));
 }
 
 .room-card__title {
@@ -445,6 +525,12 @@ img {
   backdrop-filter: blur(10px);
 }
 
+.phone-shell--home .room-card__title {
+  margin-bottom: 8px;
+  padding: 8px 14px;
+  font-size: 0.98rem;
+}
+
 .room-card__scene {
   position: relative;
   display: grid;
@@ -456,34 +542,9 @@ img {
   overflow: hidden;
 }
 
-.room-card__image-placeholder {
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-height: 28px;
-  padding: 0 10px;
-  border: 1px solid rgba(255, 255, 255, 0.9);
-  border-radius: 999px;
-  color: #58687f;
-  font-size: 0.68rem;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(8px);
-  z-index: 1;
-  box-shadow: 0 10px 22px rgba(36, 48, 71, 0.12);
-}
-
-.room-card__image-placeholder-icon {
-  width: 22px;
-  height: 22px;
-  object-fit: contain;
-  filter: drop-shadow(0 3px 6px rgba(15, 28, 56, 0.18));
+.phone-shell--home .room-card__scene {
+  min-height: 214px;
+  margin-bottom: 8px;
 }
 
 .room-card__pet {
@@ -501,8 +562,8 @@ img {
   position: absolute;
   left: 50%;
   bottom: 6px;
-  width: 144px;
-  height: 38px;
+  width: 164px;
+  height: 42px;
   border-radius: 999px;
   background: radial-gradient(circle, rgba(18, 28, 45, 0.28) 0%, rgba(18, 28, 45, 0.16) 45%, rgba(18, 28, 45, 0) 100%);
   transform: translateX(-50%);
@@ -531,8 +592,8 @@ img {
 
 .room-card__pet .avatar-circle {
   position: relative;
-  width: 216px;
-  height: 216px;
+  width: 238px;
+  height: 238px;
   border: 0;
   border-radius: 0;
   background: transparent;
@@ -540,6 +601,17 @@ img {
   overflow: visible;
   transform-origin: center bottom;
   will-change: transform;
+}
+
+.phone-shell--home .room-card__pet {
+  margin-bottom: 26px;
+}
+
+.phone-shell--home .room-card__sleep-bubble {
+  top: -2px;
+  right: 0;
+  padding: 6px 10px;
+  font-size: 0.9rem;
 }
 
 .room-card__pet .avatar-circle__image {
@@ -573,22 +645,28 @@ img {
   filter: drop-shadow(0 2px 2px rgba(255, 255, 255, 0.22));
 }
 
+.pet-face__mouth--hungry {
+  transform-box: fill-box;
+  transform-origin: center top;
+  animation: hungry-mouth-chomp 0.9s ease-in-out infinite;
+}
+
 .pet-face--pet-1 {
-  width: 96px;
-  left: 59px;
-  top: 66px;
+  width: 108px;
+  left: 65px;
+  top: 74px;
 }
 
 .pet-face--pet-2 {
-  width: 92px;
-  left: 61px;
-  top: 63px;
+  width: 104px;
+  left: 67px;
+  top: 70px;
 }
 
 .pet-face--pet-3 {
-  width: 82px;
-  left: 68px;
-  top: 86px;
+  width: 92px;
+  left: 75px;
+  top: 96px;
 }
 
 @keyframes pet-shadow-pulse {
@@ -612,6 +690,21 @@ img {
 
   50% {
     transform: translateY(-6px) rotate(2deg);
+  }
+}
+
+@keyframes hungry-mouth-chomp {
+  0%,
+  100% {
+    transform: translateY(0) scaleY(0.84);
+  }
+
+  45% {
+    transform: translateY(2px) scaleY(1.08);
+  }
+
+  70% {
+    transform: translateY(1px) scaleY(0.92);
   }
 }
 
@@ -675,7 +768,8 @@ img {
 @media (prefers-reduced-motion: reduce) {
   .room-card__pet::after,
   .room-card__pet .avatar-circle,
-  .room-card__sleep-bubble {
+  .room-card__sleep-bubble,
+  .pet-face__mouth--hungry {
     animation: none;
   }
 }
@@ -686,6 +780,11 @@ img {
   display: grid;
   gap: 10px;
   margin-bottom: 14px;
+}
+
+.phone-shell--home .room-card__meta {
+  gap: 6px;
+  margin-bottom: 8px;
 }
 
 .room-card__description,
@@ -705,6 +804,17 @@ img {
   backdrop-filter: blur(10px);
 }
 
+.phone-shell--home .room-card__description,
+.phone-shell--home .room-card__status,
+.phone-shell--home .room-card__hint {
+  font-size: 0.74rem;
+  line-height: 1.34;
+}
+
+.phone-shell--home .room-card__description {
+  padding: 9px 10px;
+}
+
 .room-card__status {
   min-height: 2.35rem;
   padding: 10px 12px;
@@ -716,6 +826,11 @@ img {
   backdrop-filter: blur(10px);
 }
 
+.phone-shell--home .room-card__status {
+  min-height: 0;
+  padding: 9px 10px;
+}
+
 .room-card__controls {
   position: relative;
   z-index: 1;
@@ -723,6 +838,10 @@ img {
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: 12px;
+}
+
+.phone-shell--home .room-card__controls {
+  gap: 8px;
 }
 
 .arrow-button {
@@ -739,34 +858,60 @@ img {
   backdrop-filter: blur(10px);
 }
 
+.phone-shell--home .arrow-button {
+  min-height: 44px;
+  font-size: 1.45rem;
+}
+
 .arrow-button:hover {
   background: rgba(255, 255, 255, 0.94);
 }
 
 .wire-button--action {
-  min-width: 124px;
+  min-width: 146px;
+  gap: 8px;
+  padding: 10px 18px;
+}
+
+.phone-shell--home .wire-button--action {
+  min-width: 140px;
   gap: 6px;
-  padding: 8px 16px;
+  padding: 8px 14px;
 }
 
 .wire-button__icon {
-  width: 38px;
-  height: 38px;
+  width: 54px;
+  height: 54px;
   object-fit: contain;
   filter: drop-shadow(0 4px 8px rgba(15, 28, 56, 0.2));
+  flex: 0 0 auto;
+}
+
+.phone-shell--home .wire-button__icon {
+  width: 44px;
+  height: 44px;
 }
 
 .room-card__hint {
   position: relative;
   z-index: 1;
   margin-top: 12px;
-  padding: 12px 14px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.84);
-  color: #31445f;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #243754;
   text-align: center;
-  box-shadow: 0 10px 22px rgba(36, 48, 71, 0.12);
-  backdrop-filter: blur(10px);
+  font-weight: 800;
+  text-shadow:
+    0 2px 8px rgba(255, 255, 255, 0.95),
+    0 0 16px rgba(255, 255, 255, 0.72);
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.phone-shell--home .room-card__hint {
+  margin-top: 8px;
+  padding: 0;
 }
 
 .system-screen {

@@ -6,7 +6,6 @@ type HomeScreenProps = {
   pet: Pet
   roomId: 'kitchen' | 'store' | 'park' | 'casino'
   roomName: string
-  roomImageLabel: string
   roomDescription: string
   roomBackgroundImage: string
   actionIcon: string
@@ -18,7 +17,6 @@ type HomeScreenProps = {
   onNextRoom: () => void
   onRoomAction: () => void
   onRestartRequest: () => void
-  isPetDead: boolean
   isActionDisabled: boolean
 }
 
@@ -26,7 +24,6 @@ function HomeScreen({
   pet,
   roomId,
   roomName,
-  roomImageLabel,
   roomDescription,
   roomBackgroundImage,
   actionIcon,
@@ -38,7 +35,6 @@ function HomeScreen({
   onNextRoom,
   onRoomAction,
   onRestartRequest,
-  isPetDead,
   isActionDisabled,
 }: HomeScreenProps) {
   return (
@@ -60,7 +56,6 @@ function HomeScreen({
         pet={pet}
         roomId={roomId}
         roomName={roomName}
-        roomImageLabel={roomImageLabel}
         roomDescription={roomDescription}
         roomBackgroundImage={roomBackgroundImage}
         actionIcon={actionIcon}
@@ -72,7 +67,6 @@ function HomeScreen({
         onNextRoom={onNextRoom}
         onRoomAction={onRoomAction}
         isActionDisabled={isActionDisabled}
-        isPetDead={isPetDead}
       />
     </div>
   )

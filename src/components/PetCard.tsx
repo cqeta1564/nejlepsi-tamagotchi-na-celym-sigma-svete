@@ -1,4 +1,6 @@
 import type { CSSProperties } from 'react'
+import coinIcon from '../assets/item-coins.png'
+import CutoutImage from './CutoutImage'
 import PetAvatar from './PetAvatar'
 import PetFace from './PetFace'
 import type { Pet } from '../types'
@@ -7,7 +9,6 @@ type PetCardProps = {
   pet: Pet
   roomId: 'kitchen' | 'store' | 'park' | 'casino'
   roomName: string
-  roomImageLabel: string
   roomDescription: string
   roomBackgroundImage: string
   actionIcon: string
@@ -19,14 +20,12 @@ type PetCardProps = {
   onNextRoom: () => void
   onRoomAction: () => void
   isActionDisabled: boolean
-  isPetDead: boolean
 }
 
 function PetCard({
   pet,
   roomId,
   roomName,
-  roomImageLabel,
   roomDescription,
   roomBackgroundImage,
   actionIcon,
@@ -38,7 +37,6 @@ function PetCard({
   onNextRoom,
   onRoomAction,
   isActionDisabled,
-  isPetDead,
 }: PetCardProps) {
   const showSleepBubble = pet.mood === 'sleepy' || pet.stats.energy <= 35
 
@@ -48,17 +46,13 @@ function PetCard({
       style={{ backgroundImage: `url(${roomBackgroundImage})` } as CSSProperties}
     >
       <div className="room-card__money">
-        <span className="money-dot" aria-hidden="true" />
+        <CutoutImage src={coinIcon} alt="" className="money-dot" />
         <span>penize {coins}</span>
       </div>
 
       <p className="room-card__title">{roomName}</p>
 
       <div className="room-card__scene">
-        <div className="room-card__image-placeholder">
-          <img src={actionIcon} alt="" className="room-card__image-placeholder-icon" aria-hidden="true" />
-          <span>{roomImageLabel}</span>
-        </div>
         <div className={`room-card__pet room-card__pet--${pet.id}`}>
           {showSleepBubble ? <span className="room-card__sleep-bubble">zzz</span> : null}
           <PetAvatar src={pet.image} alt={pet.name}>
@@ -83,7 +77,7 @@ function PetCard({
           onClick={onRoomAction}
           disabled={isActionDisabled}
         >
-          <img src={actionIcon} alt="" className="wire-button__icon" aria-hidden="true" />
+          <CutoutImage src={actionIcon} alt="" className="wire-button__icon" />
           {actionLabel}
           <span className="wire-button__subtext">{actionCost} penez</span>
         </button>
@@ -92,14 +86,6 @@ function PetCard({
           &rarr;
         </button>
       </div>
-
-      <p className="room-card__hint">
-        {isPetDead
-          ? 'Mazlicek uz nemuze pokracovat. Zaloz novou hru.'
-          : coins < actionCost
-            ? 'Na tuhle aktivitu ted nemas dost penez.'
-            : `Aktualni nalada: ${pet.mood}`}
-      </p>
     </section>
   )
 }

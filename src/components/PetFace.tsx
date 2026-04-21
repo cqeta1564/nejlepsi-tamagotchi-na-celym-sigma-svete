@@ -141,7 +141,7 @@ function renderEyes(eyeState: EyeState) {
 function renderMouth(mouthState: MouthState) {
   if (mouthState === 'hungry') {
     return (
-      <>
+      <g className="pet-face__mouth pet-face__mouth--hungry">
         <path
           d="M40 63C50 76 71 77 82 63"
           fill="none"
@@ -157,7 +157,7 @@ function renderMouth(mouthState: MouthState) {
           strokeLinejoin="round"
         />
         <rect x="63" y="66" width="8" height="12" rx="2" fill="white" />
-      </>
+      </g>
     )
   }
 

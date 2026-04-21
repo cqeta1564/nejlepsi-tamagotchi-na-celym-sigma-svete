@@ -6,7 +6,7 @@ import StatusModal from './components/StatusModal'
 import itemAutomatImage from './assets/item-automat.png'
 import itemKafeCigoImage from './assets/item-kafe-cigo.png'
 import itemMonsterImage from './assets/item-monster.png'
-import itemParkDangerImage from './assets/item-park-danger.svg'
+import itemParkDangerImage from './assets/item-park-danger.png'
 import roomCasinoImage from './assets/room-casino.png'
 import roomKitchenImage from './assets/room-kitchen.png'
 import roomParkImage from './assets/room-park.png'
@@ -125,6 +125,7 @@ function App() {
   const currentRoom = rooms[roomIndex]
   const isPetDead = selectedPet ? hasAnyZeroStat(selectedPet.stats) : false
   const cannotAffordAction = coins < currentRoom.actionCost
+  const isHomeScreen = gameState.currentScreen === 'home' && Boolean(selectedPet)
 
   useEffect(() => {
     try {
@@ -373,7 +374,7 @@ function App() {
 
   return (
     <main
-      className="app-page"
+      className={`app-page${isHomeScreen ? ' app-page--home' : ''}`}
       style={
         {
           '--color-primary': COLORS.primary,
@@ -389,13 +390,13 @@ function App() {
         } as CSSProperties
       }
     >
-      <section className="phone-shell">
+      <section className={`phone-shell${isHomeScreen ? ' phone-shell--home' : ''}`}>
         <header className="app-shell-header">
           <p className="app-shell-header__eyebrow">Virtualni Tamagotchi</p>
           <h1 className="app-shell-header__title">Mobile-first sigma pet care</h1>
         </header>
 
-        <main className="app-shell-main">
+        <main className={`app-shell-main${isHomeScreen ? ' app-shell-main--home' : ''}`}>
           {gameState.currentScreen === 'selection' || !selectedPet ? (
             <PetSelectionScreen
               pets={gameState.pets}
@@ -408,7 +409,6 @@ function App() {
               pet={selectedPet}
               roomId={currentRoom.id}
               roomName={currentRoom.name}
-              roomImageLabel={currentRoom.imageLabel}
               roomDescription={currentRoom.description}
               roomBackgroundImage={currentRoom.backgroundImage}
               actionIcon={currentRoom.actionIcon}
@@ -420,7 +420,6 @@ function App() {
               onNextRoom={handleNextRoom}
               onRoomAction={handleRoomAction}
               onRestartRequest={handleRequestRestart}
-              isPetDead={isPetDead}
               isActionDisabled={isPetDead || cannotAffordAction}
             />
           )}
