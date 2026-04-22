@@ -391,9 +391,21 @@ function App() {
       }
     >
       <section className={`phone-shell${isHomeScreen ? ' phone-shell--home' : ''}`}>
-        <header className="app-shell-header">
-          <p className="app-shell-header__eyebrow">Virtualni Tamagotchi</p>
-          <h1 className="app-shell-header__title">Mobile-first sigma pet care</h1>
+        <header className={`app-shell-header${isHomeScreen ? ' app-shell-header--home' : ''}`}>
+          <div className="app-shell-header__copy">
+            <p className="app-shell-header__eyebrow">Virtualni Tamagotchi</p>
+            <h1 className="app-shell-header__title">nejlepsi tamagotchi na celym svete</h1>
+          </div>
+
+          {isHomeScreen ? (
+            <button
+              type="button"
+              className="wire-button wire-button--small wire-button--primary app-shell-header__action"
+              onClick={handleRequestRestart}
+            >
+              nova hra
+            </button>
+          ) : null}
         </header>
 
         <main className={`app-shell-main${isHomeScreen ? ' app-shell-main--home' : ''}`}>
@@ -419,7 +431,6 @@ function App() {
               onPrevRoom={handlePrevRoom}
               onNextRoom={handleNextRoom}
               onRoomAction={handleRoomAction}
-              onRestartRequest={handleRequestRestart}
               isActionDisabled={isPetDead || cannotAffordAction}
             />
           )}

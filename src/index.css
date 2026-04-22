@@ -93,6 +93,16 @@ img {
   padding: 4px 10px 10px;
 }
 
+.app-shell-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.app-shell-header__copy {
+  min-width: 0;
+}
+
 .app-shell-header__eyebrow {
   margin: 0;
   color: var(--color-text-secondary);
@@ -109,6 +119,10 @@ img {
   letter-spacing: -0.02em;
 }
 
+.app-shell-header__action {
+  align-self: flex-start;
+}
+
 .app-shell-main {
   flex: 1;
   display: flex;
@@ -121,6 +135,10 @@ img {
 
 .phone-shell--home .app-shell-header {
   padding: 2px 8px 4px;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 6px;
 }
 
 .phone-shell--home .app-shell-header__eyebrow {
@@ -129,6 +147,20 @@ img {
 
 .phone-shell--home .app-shell-header__title {
   font-size: 0.88rem;
+  line-height: 1.15;
+}
+
+.phone-shell--home .app-shell-header__copy {
+  flex: 1 1 auto;
+}
+
+.phone-shell--home .app-shell-header__action {
+  flex: 0 0 auto;
+  min-height: 38px;
+  padding-inline: 12px;
+  border-radius: 14px;
+  font-size: 0.76rem;
+  align-self: center;
 }
 
 .phone-shell--home .app-shell-footer {
@@ -321,25 +353,36 @@ img {
   padding: 2px 4px 0;
 }
 
-.top-bar {
+.home-layout {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.home-layout__stats,
+.home-layout__stage {
+  min-width: 0;
+}
+
+.home-layout__stats {
+  display: grid;
+}
+
+.home-layout__stage {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.home-layout__stage > .room-card {
+  flex: 1;
 }
 
 .phone-shell--home .wire-screen--game {
   gap: 8px;
   padding: 0 2px;
-}
-
-.phone-shell--home .top-bar {
-  margin-bottom: 6px;
-}
-
-.top-bar__spacer {
-  width: 88px;
-  height: 1px;
 }
 
 .wire-button--small {
@@ -548,6 +591,7 @@ img {
 }
 
 .room-card__pet {
+  --pet-size: 238px;
   position: relative;
   z-index: 2;
   display: grid;
@@ -561,9 +605,9 @@ img {
   content: "";
   position: absolute;
   left: 50%;
-  bottom: 6px;
-  width: 164px;
-  height: 42px;
+  bottom: calc(var(--pet-size) * 0.025);
+  width: calc(var(--pet-size) * 0.689);
+  height: calc(var(--pet-size) * 0.176);
   border-radius: 999px;
   background: radial-gradient(circle, rgba(18, 28, 45, 0.28) 0%, rgba(18, 28, 45, 0.16) 45%, rgba(18, 28, 45, 0) 100%);
   transform: translateX(-50%);
@@ -592,8 +636,8 @@ img {
 
 .room-card__pet .avatar-circle {
   position: relative;
-  width: 238px;
-  height: 238px;
+  width: var(--pet-size);
+  height: var(--pet-size);
   border: 0;
   border-radius: 0;
   background: transparent;
@@ -652,21 +696,21 @@ img {
 }
 
 .pet-face--pet-1 {
-  width: 108px;
-  left: 65px;
-  top: 74px;
+  width: 45.4%;
+  left: 27.3%;
+  top: 31.1%;
 }
 
 .pet-face--pet-2 {
-  width: 104px;
-  left: 67px;
-  top: 70px;
+  width: 43.7%;
+  left: 28.2%;
+  top: 29.4%;
 }
 
 .pet-face--pet-3 {
-  width: 92px;
-  left: 75px;
-  top: 96px;
+  width: 38.7%;
+  left: 31.5%;
+  top: 40.3%;
 }
 
 @keyframes pet-shadow-pulse {
@@ -1010,6 +1054,230 @@ img {
 
   .phone-shell {
     min-height: auto;
+  }
+}
+
+@media (min-width: 820px) {
+  .app-page {
+    padding: 24px 20px 32px;
+    align-items: center;
+  }
+
+  .phone-shell {
+    width: min(100%, 960px);
+    padding-inline: 10px;
+  }
+
+  .app-shell-header,
+  .app-shell-footer {
+    padding-inline: 16px;
+  }
+
+  .wire-screen--selection {
+    width: min(100%, 760px);
+    margin-inline: auto;
+  }
+
+  .pet-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .pet-choice:nth-child(3) {
+    grid-column: auto;
+    width: 100%;
+    justify-self: stretch;
+  }
+
+  .wire-button--confirm {
+    width: min(100%, 360px);
+    align-self: center;
+  }
+
+  .phone-shell--home {
+    width: min(100%, 1120px);
+  }
+
+  .phone-shell--home .app-shell-header {
+    padding: 4px 14px 10px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .phone-shell--home .app-shell-header__eyebrow {
+    font-size: 0.7rem;
+  }
+
+  .phone-shell--home .app-shell-header__title {
+    font-size: 0.95rem;
+  }
+
+  .phone-shell--home .app-shell-header__action {
+    flex: 0 0 auto;
+    align-self: center;
+  }
+
+  .home-layout__stats .stats-row {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    margin-bottom: 0;
+  }
+
+  .phone-shell--home .room-card {
+    padding: 16px;
+  }
+
+  .phone-shell--home .room-card__scene {
+    min-height: 320px;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 540px) {
+  .app-page {
+    padding: 10px 8px 12px;
+  }
+
+  .phone-shell {
+    width: min(100%, 980px);
+  }
+
+  .wire-screen--selection {
+    padding-top: 4px;
+  }
+
+  .wire-screen--selection h1 {
+    margin: 10px 0 14px;
+  }
+
+  .pet-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .pet-choice:nth-child(3) {
+    grid-column: auto;
+    width: 100%;
+    justify-self: stretch;
+  }
+
+  .wire-button--confirm {
+    width: min(100%, 320px);
+    align-self: center;
+    margin-top: 14px;
+  }
+
+  .phone-shell--home .app-shell-header {
+    padding: 0 8px 4px;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .phone-shell--home .app-shell-header__eyebrow {
+    font-size: 0.58rem;
+  }
+
+  .phone-shell--home .app-shell-header__title {
+    font-size: 0.8rem;
+  }
+
+  .phone-shell--home .app-shell-header__action {
+    min-height: 34px;
+    padding-inline: 12px;
+    font-size: 0.74rem;
+    align-self: center;
+  }
+
+  .phone-shell--home .wire-screen--game {
+    gap: 8px;
+  }
+
+  .home-layout__stats .stats-row {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+    margin-bottom: 0;
+  }
+
+  .phone-shell--home .room-card {
+    padding: 10px 12px 12px;
+    border-radius: 24px;
+  }
+
+  .phone-shell--home .room-card__money {
+    gap: 8px;
+    margin-bottom: 6px;
+    font-size: 1.05rem;
+  }
+
+  .phone-shell--home .money-dot {
+    width: 34px;
+    height: 34px;
+  }
+
+  .phone-shell--home .room-card__title {
+    margin-bottom: 6px;
+    padding: 7px 12px;
+    font-size: 0.92rem;
+  }
+
+  .phone-shell--home .room-card__scene {
+    min-height: 146px;
+    margin-bottom: 6px;
+  }
+
+  .phone-shell--home .room-card__pet {
+    --pet-size: 178px;
+    margin-bottom: 4px;
+  }
+
+  .phone-shell--home .room-card__sleep-bubble {
+    top: -2px;
+    right: -4px;
+    padding: 5px 9px;
+    font-size: 0.78rem;
+  }
+
+  .phone-shell--home .room-card__meta {
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+
+  .phone-shell--home .room-card__description,
+  .phone-shell--home .room-card__status,
+  .phone-shell--home .room-card__hint {
+    font-size: 0.7rem;
+    line-height: 1.28;
+  }
+
+  .phone-shell--home .room-card__description,
+  .phone-shell--home .room-card__status {
+    min-height: 100%;
+    padding: 8px 9px;
+  }
+
+  .phone-shell--home .room-card__controls {
+    gap: 6px;
+  }
+
+  .phone-shell--home .arrow-button {
+    min-height: 40px;
+    font-size: 1.2rem;
+  }
+
+  .phone-shell--home .wire-button--action {
+    min-width: 0;
+    padding: 8px 12px;
+  }
+
+  .phone-shell--home .wire-button__icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .phone-shell--home .room-card__hint {
+    margin-top: 6px;
   }
 }
 
