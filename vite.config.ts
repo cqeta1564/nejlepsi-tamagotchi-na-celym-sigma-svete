@@ -2,8 +2,16 @@ import { createHash } from 'node:crypto'
 import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 
-<<<<<<< Updated upstream
 const FALLBACK_REPOSITORY_NAME = 'nejlepsi-tamagotchi-na-celym-sigma-svete'
+const APP_CACHE_PREFIX = 'sigma-tamagotchi'
+const PUBLIC_PWA_FILES = [
+  'apple-touch-icon.png',
+  'favicon.svg',
+  'manifest.webmanifest',
+  'maskable-icon-512x512.png',
+  'pwa-192x192.png',
+  'pwa-512x512.png',
+]
 
 function resolveBasePath() {
   const repositoryName =
@@ -14,16 +22,7 @@ function resolveBasePath() {
   }
 
   return process.env.GITHUB_ACTIONS ? `/${repositoryName}/` : '/'
-=======
-const APP_CACHE_PREFIX = 'sigma-tamagotchi'
-const PUBLIC_PWA_FILES = [
-  'apple-touch-icon.png',
-  'favicon.svg',
-  'manifest.webmanifest',
-  'maskable-icon-512x512.png',
-  'pwa-192x192.png',
-  'pwa-512x512.png',
-]
+}
 
 function createPwaPlugin(): Plugin {
   let base = '/'
@@ -154,16 +153,10 @@ self.addEventListener('fetch', (event) => {
       })
     },
   }
->>>>>>> Stashed changes
 }
 
 // https://vite.dev/config/
 export default defineConfig({
-<<<<<<< Updated upstream
-  base: resolveBasePath(),
-  plugins: [react()],
-=======
   plugins: [react(), createPwaPlugin()],
-  base: '/nejlepsi-tamagotchi-na-celym-sigma-svete/',
->>>>>>> Stashed changes
+  base: resolveBasePath(),
 })
