@@ -88,19 +88,17 @@ function removeBrightEdgeBackground(image: HTMLImageElement) {
 }
 
 function CutoutImage({ src, alt, className, onError }: CutoutImageProps) {
-  const [displaySrc, setDisplaySrc] = useState<string | null>(
-    cleanedImageCache.get(src) ?? null,
-  )
+  const [loadedImage, setLoadedImage] = useState<{
+    src: string
+    cleanedSrc: string
+  } | null>(null)
+  const cachedSrc = cleanedImageCache.get(src) ?? null
+  const displaySrc = cachedSrc ?? (loadedImage?.src === src ? loadedImage.cleanedSrc : null)
 
   useEffect(() => {
-    const cachedSrc = cleanedImageCache.get(src)
-
     if (cachedSrc) {
-      setDisplaySrc(cachedSrc)
       return
     }
-
-    setDisplaySrc(null)
 
     let isActive = true
     const image = new Image()
@@ -113,7 +111,10 @@ function CutoutImage({ src, alt, className, onError }: CutoutImageProps) {
 
       const cleanedSrc = removeBrightEdgeBackground(image)
       cleanedImageCache.set(src, cleanedSrc)
-      setDisplaySrc(cleanedSrc)
+      setLoadedImage({
+        src,
+        cleanedSrc,
+      })
     }
 
     image.onerror = () => {
@@ -129,7 +130,7 @@ function CutoutImage({ src, alt, className, onError }: CutoutImageProps) {
     return () => {
       isActive = false
     }
-  }, [onError, src])
+  }, [cachedSrc, onError, src])
 
   if (!displaySrc) {
     return null
