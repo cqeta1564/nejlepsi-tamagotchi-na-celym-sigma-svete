@@ -16,7 +16,6 @@ type HomeScreenProps = {
   onPrevRoom: () => void
   onNextRoom: () => void
   onRoomAction: () => void
-  onRestartRequest: () => void
   isActionDisabled: boolean
 }
 
@@ -34,40 +33,34 @@ function HomeScreen({
   onPrevRoom,
   onNextRoom,
   onRoomAction,
-  onRestartRequest,
   isActionDisabled,
 }: HomeScreenProps) {
   return (
     <div className="wire-screen wire-screen--game">
-      <div className="top-bar">
-        <div className="top-bar__spacer" />
-        <button
-          type="button"
-          className="wire-button wire-button--small wire-button--primary"
-          onClick={onRestartRequest}
-        >
-          nova hra
-        </button>
+      <div className="home-layout">
+        <div className="home-layout__stats">
+          <StatsPanel stats={pet.stats} />
+        </div>
+
+        <div className="home-layout__stage">
+          <PetCard
+            pet={pet}
+            roomId={roomId}
+            roomName={roomName}
+            roomDescription={roomDescription}
+            roomBackgroundImage={roomBackgroundImage}
+            actionIcon={actionIcon}
+            actionLabel={actionLabel}
+            actionCost={actionCost}
+            coins={coins}
+            statusText={statusText}
+            onPrevRoom={onPrevRoom}
+            onNextRoom={onNextRoom}
+            onRoomAction={onRoomAction}
+            isActionDisabled={isActionDisabled}
+          />
+        </div>
       </div>
-
-      <StatsPanel stats={pet.stats} />
-
-      <PetCard
-        pet={pet}
-        roomId={roomId}
-        roomName={roomName}
-        roomDescription={roomDescription}
-        roomBackgroundImage={roomBackgroundImage}
-        actionIcon={actionIcon}
-        actionLabel={actionLabel}
-        actionCost={actionCost}
-        coins={coins}
-        statusText={statusText}
-        onPrevRoom={onPrevRoom}
-        onNextRoom={onNextRoom}
-        onRoomAction={onRoomAction}
-        isActionDisabled={isActionDisabled}
-      />
     </div>
   )
 }

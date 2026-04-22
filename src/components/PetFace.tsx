@@ -175,13 +175,38 @@ function renderMouth(mouthState: MouthState) {
 
   if (mouthState === 'flat') {
     return (
-      <path
-        d="M49 74C58 72 68 72 77 73"
-        fill="none"
-        stroke="#111111"
-        strokeWidth="4"
-        strokeLinecap="round"
-      />
+      <>
+        <path
+          d="M49 74C58 72 68 72 77 73"
+          fill="none"
+          stroke="#111111"
+          strokeWidth="4"
+          strokeLinecap="round"
+        />
+        <g transform="translate(63 73) rotate(38)">
+          <rect x="-4" y="-2" width="8" height="26" rx="4" fill="#67D9F4" />
+          <rect x="-2.6" y="0" width="5.2" height="21" rx="2.6" fill="#91E8FB" />
+          <rect x="-1.1" y="3" width="2.2" height="14" rx="1.1" fill="#325AA6" />
+          <rect x="-1.1" y="16" width="2.2" height="5" rx="1.1" fill="#D7816C" />
+          <circle cx="0" cy="25" r="7.8" fill="#67D9F4" />
+          <circle cx="0" cy="25" r="5.7" fill="#91E8FB" />
+          <circle cx="0" cy="25" r="4.5" fill="#B97A67" />
+          <path
+            d="M-6 3H-9M-6 7H-10M-6 11H-9M-6 15H-10"
+            fill="none"
+            stroke="#325AA6"
+            strokeWidth="1.4"
+            strokeLinecap="round"
+          />
+          <path
+            d="M2.5 2.5C4.2 5.6 4.1 11.8 3 18.5"
+            fill="none"
+            stroke="rgba(255,255,255,0.34)"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+          />
+        </g>
+      </>
     )
   }
 
