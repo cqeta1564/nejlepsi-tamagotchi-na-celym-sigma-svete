@@ -5,10 +5,10 @@ type PetNameProps = {
 
 function PetName({ name, species }: PetNameProps) {
   return (
-    <span className="pet-name">
-      <span className="pet-name__title">{name}</span>
-      <span className="pet-name__subtitle">{species}</span>
-    </span>
+    <div className="pet-name">
+      <h2>{name}</h2>
+      <p>{species}</p>
+    </div>
   )
 }
 

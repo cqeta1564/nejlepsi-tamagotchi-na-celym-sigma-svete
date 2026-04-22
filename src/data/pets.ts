@@ -1,13 +1,16 @@
-import type { PetSeed } from '../types'
+import bobekImage from '../assets/bobek.png'
+import bojkaImage from '../assets/bojka.png'
+import gumaImage from '../assets/guma.png'
+import type { Pet } from '../types'
 
-export const mockPets: PetSeed[] = [
+export const mockPets: Pet[] = [
   {
     id: 'pet-1',
-    name: 'Mochi',
-    species: 'Cat',
-    description: 'Playful pet that loves attention and naps in sunny spots.',
+    name: 'Bobek',
+    species: 'Chaos blob',
+    description: 'Mazlicek, co vypada nevinne, ale vzdycky vymysli nejaky maly prusvih.',
     mood: 'happy',
-    image: '/images/pets/mochi.png',
+    image: bobekImage,
     stats: {
       food: 78,
       health: 92,
@@ -17,11 +20,11 @@ export const mockPets: PetSeed[] = [
   },
   {
     id: 'pet-2',
-    name: 'Pixel',
-    species: 'Fox',
-    description: 'Curious pet that explores everything and gets hungry fast.',
+    name: 'Guma',
+    species: 'Poulicni pneu',
+    description: 'Tvrdy mazlicek se srdcem ze zavodni drahy a apetitem na dobrodruzstvi.',
     mood: 'hungry',
-    image: '/images/pets/pixel.png',
+    image: gumaImage,
     stats: {
       food: 34,
       health: 84,
@@ -31,11 +34,11 @@ export const mockPets: PetSeed[] = [
   },
   {
     id: 'pet-3',
-    name: 'Bublina',
-    species: 'Axolotl',
-    description: 'Calm pet that likes quiet moments and long underwater rests.',
+    name: 'Bojka',
+    species: 'Pristavni strazce',
+    description: 'Klidny vodni partak, ktery hlida hladinu a sbira naladu z kazde vlny.',
     mood: 'sleepy',
-    image: '/images/pets/bublina.png',
+    image: bojkaImage,
     stats: {
       food: 61,
       health: 88,

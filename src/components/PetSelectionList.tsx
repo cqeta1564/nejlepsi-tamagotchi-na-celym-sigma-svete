@@ -1,5 +1,5 @@
-import type { Pet } from '../types'
 import PetOptionCard from './PetOptionCard'
+import type { Pet } from '../types'
 
 type PetSelectionListProps = {
   pets: Pet[]
@@ -7,21 +7,9 @@ type PetSelectionListProps = {
   onSelect: (petId: string) => void
 }
 
-function PetSelectionList({
-  pets,
-  selectedPetId,
-  onSelect,
-}: PetSelectionListProps) {
-  if (pets.length === 0) {
-    return (
-      <div className="empty-state" role="status">
-        Momentalne nejsou dostupni zadni mazlicci. Zkontroluj zdrojova data a zkus to znovu.
-      </div>
-    )
-  }
-
+function PetSelectionList({ pets, selectedPetId, onSelect }: PetSelectionListProps) {
   return (
-    <div className="pet-selection-list">
+    <div className="pet-grid">
       {pets.map((pet) => (
         <PetOptionCard
           key={pet.id}

@@ -1,53 +1,37 @@
-import { useEffect } from 'react'
-
 type StatusModalProps = {
   isOpen: boolean
   title: string
   message: string
+  variant?: 'info' | 'restart' | 'dead'
   onClose: () => void
+  onConfirm?: () => void
 }
 
 function StatusModal({
   isOpen,
   title,
   message,
+  variant = 'info',
   onClose,
+  onConfirm,
 }: StatusModalProps) {
-  useEffect(() => {
-    if (!isOpen) {
-      return
-    }
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        onClose()
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [isOpen, onClose])
-
   if (!isOpen) {
     return null
   }
 
+  const buttonLabel = variant === 'info' ? 'zavrit' : 'Zacit znovu'
+
   return (
-    <div className="status-modal" onClick={onClose}>
-      <div
-        className="status-modal__card"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="status-modal-title"
-        onClick={(event) => event.stopPropagation()}
-      >
-        <h2 id="status-modal-title">{title}</h2>
-        <p>{message}</p>
-        <button type="button" className="primary-button" onClick={onClose}>
-          Rozumim
+    <div className="modal-overlay" role="presentation" onClick={onClose}>
+      <div className="wire-modal" role="dialog" aria-modal="true" onClick={(event) => event.stopPropagation()}>
+        <p className="wire-modal__title">{title}</p>
+        {message ? <p className="wire-modal__message">{message}</p> : null}
+        <button
+          type="button"
+          className="wire-button wire-button--modal wire-button--primary"
+          onClick={onConfirm ?? onClose}
+        >
+          {buttonLabel}
         </button>
       </div>
     </div>

@@ -6,11 +6,9 @@ type ScreenHeaderProps = {
 function ScreenHeader({ title, subtitle }: ScreenHeaderProps) {
   return (
     <header className="screen-header">
-      <p className="screen-header__eyebrow">MVP flow</p>
-      <h2 className="screen-header__title">{title}</h2>
-      {subtitle ? (
-        <p className="screen-header__subtitle">{subtitle}</p>
-      ) : null}
+      <p className="screen-header__eyebrow">Herni obrazovka</p>
+      <h2>{title}</h2>
+      {subtitle ? <p className="screen-header__subtitle">{subtitle}</p> : null}
     </header>
   )
 }

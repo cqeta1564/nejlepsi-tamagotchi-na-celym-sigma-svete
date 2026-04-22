@@ -3,18 +3,15 @@ type SelectPetButtonProps = {
   onClick: () => void
 }
 
-function SelectPetButton({
-  disabled = false,
-  onClick,
-}: SelectPetButtonProps) {
+function SelectPetButton({ disabled, onClick }: SelectPetButtonProps) {
   return (
     <button
       type="button"
-      className="primary-button"
+      className="wire-button wire-button--confirm wire-button--primary"
       disabled={disabled}
       onClick={onClick}
     >
-      Potvrdit vyber
+      potvrdit vyber
     </button>
   )
 }

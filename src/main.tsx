@@ -7,9 +7,6 @@ import { registerServiceWorker } from './registerServiceWorker'
 
 registerServiceWorker()
 
-for (const [variable, value] of Object.entries(THEME_CSS_VARIABLES)) {
-  document.documentElement.style.setProperty(variable, value)
-}
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

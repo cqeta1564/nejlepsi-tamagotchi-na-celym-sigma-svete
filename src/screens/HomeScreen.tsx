@@ -1,72 +1,67 @@
-import RoomStage from '../components/RoomStage'
+import PetCard from '../components/PetCard'
 import StatsPanel from '../components/StatsPanel'
-import type { Pet, PetAction, Room } from '../types'
+import type { Pet } from '../types'
 
 type HomeScreenProps = {
   pet: Pet
-  room: Room
-  roomAction: PetAction
-  isRoomActionAvailable?: boolean
-  canChangeRoom?: boolean
-  onActionClick: (actionId: PetAction['id']) => void
-  onPreviousRoom: () => void
+  roomId: 'kitchen' | 'store' | 'park' | 'casino'
+  roomName: string
+  roomDescription: string
+  roomBackgroundImage: string
+  actionIcon: string
+  actionLabel: string
+  actionCost: number
+  coins: number
+  statusText: string
+  onPrevRoom: () => void
   onNextRoom: () => void
-  onChangePet: () => void
-  onResetGame: () => void
+  onRoomAction: () => void
+  isActionDisabled: boolean
 }
 
 function HomeScreen({
   pet,
-  room,
-  roomAction,
-  isRoomActionAvailable = true,
-  canChangeRoom = true,
-  onActionClick,
-  onPreviousRoom,
+  roomId,
+  roomName,
+  roomDescription,
+  roomBackgroundImage,
+  actionIcon,
+  actionLabel,
+  actionCost,
+  coins,
+  statusText,
+  onPrevRoom,
   onNextRoom,
-  onChangePet,
-  onResetGame,
+  onRoomAction,
+  isActionDisabled,
 }: HomeScreenProps) {
   return (
-    <section className="screen screen--home">
-      <div className="home-screen__topbar">
-        <div>
-          <p className="screen-header__eyebrow">Webove tamagotchi</p>
-          <h2 className="screen-header__title">{pet.name}</h2>
+    <div className="wire-screen wire-screen--game">
+      <div className="home-layout">
+        <div className="home-layout__stats">
+          <StatsPanel stats={pet.stats} />
         </div>
-        <button
-          type="button"
-          className="secondary-button secondary-button--danger"
-          onClick={onResetGame}
-        >
-          Nova hra
-        </button>
+
+        <div className="home-layout__stage">
+          <PetCard
+            pet={pet}
+            roomId={roomId}
+            roomName={roomName}
+            roomDescription={roomDescription}
+            roomBackgroundImage={roomBackgroundImage}
+            actionIcon={actionIcon}
+            actionLabel={actionLabel}
+            actionCost={actionCost}
+            coins={coins}
+            statusText={statusText}
+            onPrevRoom={onPrevRoom}
+            onNextRoom={onNextRoom}
+            onRoomAction={onRoomAction}
+            isActionDisabled={isActionDisabled}
+          />
+        </div>
       </div>
-
-      <StatsPanel stats={pet.stats} />
-
-      <RoomStage
-        pet={pet}
-        room={room}
-        action={roomAction}
-        isActionAvailable={isRoomActionAvailable}
-        canChangeRoom={canChangeRoom}
-        onActionClick={onActionClick}
-        onPreviousRoom={onPreviousRoom}
-        onNextRoom={onNextRoom}
-      />
-
-      <div className="home-screen__toolbar">
-        <button type="button" className="secondary-button" onClick={onChangePet}>
-          Zmenit mazlicka
-        </button>
-        <p className="home-screen__hint">
-          {isRoomActionAvailable
-            ? `${pet.species} je s tebou v mistnosti ${room.name}.`
-            : `${room.name} je nactena ve fallback rezimu, proto je akce docasne vypnuta.`}
-        </p>
-      </div>
-    </section>
+    </div>
   )
 }
 

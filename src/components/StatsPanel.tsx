@@ -1,37 +1,39 @@
+import type { CSSProperties } from 'react'
 import type { PetStats } from '../types'
-import StatBar from './StatBar'
 
 type StatsPanelProps = {
   stats: PetStats
 }
 
-const STAT_LABELS = {
-  food: 'Hlad',
-  health: 'Zdravi',
-  happiness: 'Stesti',
-  energy: 'Energie',
-} as const
-
 function StatsPanel({ stats }: StatsPanelProps) {
   return (
-    <section className="stats-panel" aria-label="Staty mazlicka">
-      <StatBar label={STAT_LABELS.food} statKey="food" value={stats.food} />
-      <StatBar
-        label={STAT_LABELS.health}
-        statKey="health"
-        value={stats.health}
-      />
-      <StatBar
-        label={STAT_LABELS.happiness}
-        statKey="happiness"
-        value={stats.happiness}
-      />
-      <StatBar
-        label={STAT_LABELS.energy}
-        statKey="energy"
-        value={stats.energy}
-      />
-    </section>
+    <div className="stats-row">
+      <StatChip label="hlad" value={stats.food} tone="food" />
+      <StatChip label="zdravi" value={stats.health} tone="health" />
+      <StatChip label="energie" value={stats.energy} tone="energy" />
+      <StatChip label="stesti" value={stats.happiness} tone="happiness" />
+    </div>
+  )
+}
+
+type StatChipProps = {
+  label: string
+  value: number
+  tone: 'food' | 'health' | 'energy' | 'happiness'
+}
+
+function StatChip({ label, value, tone }: StatChipProps) {
+  const fillHeight = `${Math.max(0, Math.min(100, value))}%`
+
+  return (
+    <div
+      className={`stat-chip stat-chip--${tone}`}
+      style={{ '--stat-fill-height': fillHeight } as CSSProperties}
+    >
+      <div className="stat-chip__fill" aria-hidden="true" />
+      <span className="stat-chip__label">{label}</span>
+      <strong className="stat-chip__value">{value}</strong>
+    </div>
   )
 }
 

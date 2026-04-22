@@ -1,5 +1,4 @@
 import PetSelectionList from '../components/PetSelectionList'
-import ScreenHeader from '../components/ScreenHeader'
 import SelectPetButton from '../components/SelectPetButton'
 import type { Pet } from '../types'
 
@@ -16,19 +15,10 @@ function PetSelectionScreen({
   onSelectPet,
   onConfirmSelection,
 }: PetSelectionScreenProps) {
-  const hasPets = pets.length > 0
-  const selectedPet = pets.find((pet) => pet.id === selectedPetId)
-
   return (
-    <section className="screen">
-      <ScreenHeader
-        title="1. Vyber si sveho mazlicka"
-        subtitle={
-          hasPets
-            ? 'Vyber se ulozi automaticky a hru spustis jednim tlacitkem.'
-            : 'Bez dat mazlicku nejde hru spustit, ale aplikace zustava funkcni.'
-        }
-      />
+    <div className="wire-screen wire-screen--selection">
+      <p className="wire-title">Webove tamagotchi</p>
+      <h1>1. Vyber si sveho mazlicka</h1>
 
       <PetSelectionList
         pets={pets}
@@ -36,20 +26,11 @@ function PetSelectionScreen({
         onSelect={onSelectPet}
       />
 
-      <div className="screen__actions">
-        <SelectPetButton
-          disabled={selectedPetId === null || !hasPets}
-          onClick={onConfirmSelection}
-        />
-        <p className="screen__hint">
-          {!hasPets
-            ? 'Nejsou k dispozici zadni mazlicci.'
-            : selectedPet
-              ? `${selectedPet.name} je pripraveny na start.`
-            : 'Nejdriv vyber jednoho mazlicka.'}
-        </p>
-      </div>
-    </section>
+      <SelectPetButton
+        disabled={!selectedPetId}
+        onClick={onConfirmSelection}
+      />
+    </div>
   )
 }
 

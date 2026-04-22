@@ -1,27 +1,28 @@
-import type { PetAction } from '../types'
 import ActionButton from './ActionButton'
+import type { PetAction } from '../types'
 
 type ActionsPanelProps = {
   actions: PetAction[]
-  disabled?: boolean
   onActionClick: (actionId: PetAction['id']) => void
 }
 
-function ActionsPanel({
-  actions,
-  disabled = false,
-  onActionClick,
-}: ActionsPanelProps) {
+function ActionsPanel({ actions, onActionClick }: ActionsPanelProps) {
   return (
-    <section className="actions-panel" aria-label="Akce mazlicka">
-      {actions.map((action) => (
-        <ActionButton
-          key={action.id}
-          action={action}
-          disabled={disabled}
-          onClick={onActionClick}
-        />
-      ))}
+    <section className="panel">
+      <div className="panel__heading">
+        <p className="panel__eyebrow">Akce</p>
+        <h3>Co bude mazlicek delat ted?</h3>
+      </div>
+
+      <div className="actions-grid">
+        {actions.map((action) => (
+          <ActionButton
+            key={action.id}
+            action={action}
+            onClick={onActionClick}
+          />
+        ))}
+      </div>
     </section>
   )
 }
