@@ -60,6 +60,14 @@ Projekt je pripraveny na nasazeni pres GitHub Pages.
 - pri buildu na GitHub Actions se automaticky nastavi spravny `base` path podle nazvu repozitare
 - pro prvni publikaci je potreba v nastaveni repozitare zapnout GitHub Pages a jako source ponechat GitHub Actions
 
+## PWA
+
+Projekt nově funguje i jako `Progressive Web App`.
+
+- obsahuje `manifest.webmanifest` s nazvem, ikonami a `display: standalone`
+- pri produkcnim buildu se vygeneruje `service worker`, ktery prednacita app shell a assety pro offline pouziti
+- pro instalaci v telefonu nebo desktopu je potreba bezet pres `HTTPS` nebo na `localhost`
+
 ## Herni logika
 
 - stav aplikace se spravuje centralne pres `useReducer`

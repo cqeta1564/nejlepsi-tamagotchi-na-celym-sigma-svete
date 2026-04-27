@@ -34,7 +34,7 @@ function CutoutImage({ src, alt, className, onError }: CutoutImageProps) {
     return () => {
       isActive = false
     }
-  }, [onError, src])
+  }, [cachedSrc, onError, src])
 
   if (!displaySrc) {
     return null
