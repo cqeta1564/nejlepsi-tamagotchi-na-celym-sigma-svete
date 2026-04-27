@@ -8,12 +8,15 @@ type CutoutImageProps = {
   onError?: () => void
 }
 
+type LoadedImage = {
+  src: string
+  displaySrc: string
+}
+
 function CutoutImage({ src, alt, className, onError }: CutoutImageProps) {
-  const [displaySrc, setDisplaySrc] = useState<string | null>(null)
+  const [loadedImage, setLoadedImage] = useState<LoadedImage | null>(null)
 
   useEffect(() => {
-    setDisplaySrc(null)
-
     let isActive = true
     loadCleanedImage(src)
       .then((cleanedSrc) => {
@@ -21,7 +24,7 @@ function CutoutImage({ src, alt, className, onError }: CutoutImageProps) {
           return
         }
 
-        setDisplaySrc(cleanedSrc)
+        setLoadedImage({ src, displaySrc: cleanedSrc })
       })
       .catch(() => {
         if (!isActive) {
@@ -34,7 +37,9 @@ function CutoutImage({ src, alt, className, onError }: CutoutImageProps) {
     return () => {
       isActive = false
     }
-  }, [cachedSrc, onError, src])
+  }, [onError, src])
+
+  const displaySrc = loadedImage?.src === src ? loadedImage.displaySrc : null
 
   if (!displaySrc) {
     return null
