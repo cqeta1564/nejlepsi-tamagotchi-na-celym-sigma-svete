@@ -1,10 +1,6 @@
 export type AppScreen = 'selection' | 'home'
 
-export type PetStatKey = 'food' | 'health' | 'happiness' | 'energy'
-
 export type PetMood = 'happy' | 'hungry' | 'sleepy' | 'sick'
-
-export type PetActionType = 'feed' | 'heal' | 'play' | 'sleep'
 
 export interface PetStats {
   food: number
@@ -21,13 +17,6 @@ export interface Pet {
   mood: PetMood
   image: string
   stats: PetStats
-}
-
-export interface PetAction {
-  id: PetActionType
-  label: string
-  description: string
-  effects: Partial<Record<PetStatKey, number>>
 }
 
 export interface GameState {

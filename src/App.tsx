@@ -11,14 +11,20 @@ import roomKitchenImage from './assets/room-kitchen.png'
 import roomParkImage from './assets/room-park.png'
 import roomStoreImage from './assets/room-store.png'
 import { mockPets } from './data/pets'
-import type { GameState, PetMood, PetStats } from './types'
+import {
+  ROOM_ACTION_COSTS,
+  clampStat,
+  executeRoomAction,
+  getMoodFromStats,
+  hasAnyZeroStat,
+  type RoomId,
+} from './game/roomActions'
+import type { GameState } from './types'
 
 const STORAGE_KEY = 'tamagotchi-wireframe-state'
 const THEME_STORAGE_KEY = 'tamagotchi-theme'
 const STAT_DECAY_INTERVAL_MS = 12000
 const COIN_REGEN_INTERVAL_MS = 5000
-
-type RoomId = 'kitchen' | 'store' | 'park' | 'casino'
 
 type Room = {
   id: RoomId
@@ -36,7 +42,7 @@ const rooms: Room[] = [
     id: 'kitchen',
     name: 'Kuchyn',
     actionLabel: 'Kafe s cigem',
-    actionCost: 8,
+    actionCost: ROOM_ACTION_COSTS.kitchen,
     imageLabel: 'Kuchyn',
     description: 'Doplni hlad a trosku probere energii.',
     backgroundImage: roomKitchenImage,
@@ -46,7 +52,7 @@ const rooms: Room[] = [
     id: 'store',
     name: 'Vecerka',
     actionLabel: 'Bily monster',
-    actionCost: 10,
+    actionCost: ROOM_ACTION_COSTS.store,
     imageLabel: 'Vecerka',
     description: 'Doplni energii, ale nestoji malo.',
     backgroundImage: roomStoreImage,
@@ -56,7 +62,7 @@ const rooms: Room[] = [
     id: 'park',
     name: 'Park na hlavnim nadrazi',
     actionLabel: 'Dat si piko',
-    actionCost: 12,
+    actionCost: ROOM_ACTION_COSTS.park,
     imageLabel: 'Park',
     description: 'Zvedne zdravi a trochu naladu.',
     backgroundImage: roomParkImage,
@@ -66,7 +72,7 @@ const rooms: Room[] = [
     id: 'casino',
     name: 'Kasino',
     actionLabel: 'Zatocit automatem',
-    actionCost: 15,
+    actionCost: ROOM_ACTION_COSTS.casino,
     imageLabel: 'Kasino',
     description: 'Doplni stesti a muzes vyhrat nebo prohrat penize.',
     backgroundImage: roomCasinoImage,
@@ -474,103 +480,6 @@ function App() {
       />
     </main>
   )
-}
-
-function executeRoomAction(roomId: RoomId, stats: PetStats, currentCoins: number) {
-  const paidCoins = Math.max(0, currentCoins - rooms.find((room) => room.id === roomId)!.actionCost)
-
-  if (roomId === 'kitchen') {
-    const nextStats = {
-      food: clampStat(stats.food + 28),
-      health: clampStat(stats.health - 2),
-      happiness: clampStat(stats.happiness + 2),
-      energy: clampStat(stats.energy + 6),
-    }
-
-    return {
-      stats: nextStats,
-      coins: paidCoins,
-      message: 'Kafe s cigem doplnilo hlad. Je to sice trochu cursed, ale zabralo to.',
-    }
-  }
-
-  if (roomId === 'store') {
-    const nextStats = {
-      food: clampStat(stats.food - 2),
-      health: clampStat(stats.health - 1),
-      happiness: clampStat(stats.happiness + 4),
-      energy: clampStat(stats.energy + 30),
-    }
-
-    return {
-      stats: nextStats,
-      coins: paidCoins,
-      message: 'Bily monster nakopl energii. Mazlicek ted vypada podstatne vic vzhuru.',
-    }
-  }
-
-  if (roomId === 'park') {
-    const nextStats = {
-      food: clampStat(stats.food - 4),
-      health: clampStat(stats.health + 24),
-      happiness: clampStat(stats.happiness + 8),
-      energy: clampStat(stats.energy - 5),
-    }
-
-    return {
-      stats: nextStats,
-      coins: paidCoins,
-      message: 'Piko v parku na hlavnim nadrazi zvedlo zdravi. Ano, tenhle mazlicek je fakt sigma projekt.',
-    }
-  }
-
-  const jackpotRoll = Math.random()
-  const coinsDelta =
-    jackpotRoll > 0.82 ? 35 : jackpotRoll > 0.52 ? 10 : jackpotRoll > 0.24 ? 0 : -8
-  const nextStats = {
-    food: clampStat(stats.food - 3),
-    health: clampStat(stats.health - 2),
-    happiness: clampStat(stats.happiness + 26),
-    energy: clampStat(stats.energy - 4),
-  }
-  const nextCoins = Math.max(0, paidCoins + coinsDelta)
-
-  return {
-    stats: nextStats,
-    coins: nextCoins,
-    message:
-      coinsDelta > 10
-        ? 'Automat se urval a trefil jackpot. Stesti vyletelo nahoru a penize taky.'
-        : coinsDelta > 0
-          ? 'Automat doplnil stesti a neco malo vysypal i do penezenky.'
-          : coinsDelta === 0
-            ? 'Stesti slo nahoru, ale penezenka zustala skoro beze zmeny.'
-            : 'Stesti se sice zvedlo, ale automat cast penez sezral.',
-  }
-}
-
-function clampStat(value: number) {
-  return Math.max(0, Math.min(100, value))
-}
-
-function getMoodFromStats(stats: PetStats): PetMood {
-  if (stats.health <= 25 || stats.energy <= 20) {
-    return 'sick'
-  }
-
-  if (stats.energy <= 40) {
-    return 'sleepy'
-  }
-
-  if (stats.food <= 40) {
-    return 'hungry'
-  }
-
-  return 'happy'
-}
-
-function hasAnyZeroStat(stats: PetStats) {
-  return Object.values(stats).some((value) => value <= 0)
 }
 
 function isPersistedState(
