@@ -316,12 +316,20 @@ function App() {
     setRoomIndex((currentValue) =>
       currentValue === 0 ? rooms.length - 1 : currentValue - 1,
     )
+
+    if (isNemamSeRadMode) {
+      queueRoomMoveInfoModal()
+    }
   }
 
   function handleNextRoom() {
     setRoomIndex((currentValue) =>
       currentValue === rooms.length - 1 ? 0 : currentValue + 1,
     )
+
+    if (isNemamSeRadMode) {
+      queueRoomMoveInfoModal()
+    }
   }
 
   function handleRoomAction() {
@@ -423,6 +431,17 @@ function App() {
 
     infoModalIdRef.current += nextModals.length
     setInfoModalQueue((currentQueue) => [...currentQueue, ...nextModals])
+  }
+
+  function queueRoomMoveInfoModal() {
+    const nextModal: InfoModal = {
+      id: infoModalIdRef.current,
+      title: 'Presun probehl',
+      message: 'Presunul ses do jine mistnosti. Tohle je potvrzovaci okenko za pohyb.',
+    }
+
+    infoModalIdRef.current += 1
+    setInfoModalQueue((currentQueue) => [...currentQueue, nextModal])
   }
 
   const queuedInfoModal = modalState.isOpen ? null : infoModalQueue[0] ?? null
