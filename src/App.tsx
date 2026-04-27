@@ -420,6 +420,8 @@ function App() {
             <HomeScreen
               pet={selectedPet}
               roomId={currentRoom.id}
+              roomIndex={roomIndex}
+              roomCount={rooms.length}
               roomName={currentRoom.name}
               roomDescription={currentRoom.description}
               roomBackgroundImage={currentRoom.backgroundImage}
