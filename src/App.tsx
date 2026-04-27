@@ -19,7 +19,8 @@ import {
   hasAnyZeroStat,
   type RoomId,
 } from './game/roomActions'
-import type { GameState } from './types'
+import { getInitialThemePreference, saveThemeMode, type ThemeMode } from './theme'
+import type { AppScreen, GameState, Pet, PetMood, PetStats } from './types'
 
 const STORAGE_KEY = 'tamagotchi-wireframe-state'
 const STAT_DECAY_INTERVAL_MS = 12000
@@ -90,7 +91,7 @@ type PersistedState = {
   roomIndex: number
   coins: number
   statusText: string
-  isNemamSeRadMode: boolean
+  isNemamSeRadMode?: boolean
 }
 
 type ModalState =
@@ -119,8 +120,7 @@ function App() {
   const [coins, setCoins] = useState(24)
   const [statusText, setStatusText] = useState('Vyber mistnost a proved cinnost.')
   const [isNemamSeRadMode, setIsNemamSeRadMode] = useState(false)
-  const [themeMode, setThemeMode] = useState<'light' | 'dark'>(() => getInitialThemeMode())
-  const [usesSystemTheme, setUsesSystemTheme] = useState(true)
+  const [themePreference, setThemePreference] = useState(() => getInitialThemePreference())
   const [isHydrating, setIsHydrating] = useState(true)
   const [storageError, setStorageError] = useState(false)
   const [infoModalQueue, setInfoModalQueue] = useState<InfoModal[]>([])
@@ -138,10 +138,12 @@ function App() {
     [gameState.pets, gameState.selectedPetId],
   )
 
-  const currentRoom = rooms[roomIndex]
+  const currentRoom = rooms[roomIndex] ?? rooms[0]
   const isPetDead = selectedPet ? hasAnyZeroStat(selectedPet.stats) : false
   const cannotAffordAction = coins < currentRoom.actionCost
   const isHomeScreen = gameState.currentScreen === 'home' && Boolean(selectedPet)
+  const themeMode = themePreference.mode
+  const usesSystemTheme = themePreference.usesSystemTheme
   const themeToggleLabel =
     themeMode === 'dark' ? 'Prepnout na svetly motiv' : 'Prepnout na tmavy motiv'
 
@@ -157,7 +159,14 @@ function App() {
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
     const handleThemeChange = (event: MediaQueryListEvent) => {
-      setThemeMode(event.matches ? 'dark' : 'light')
+      setThemePreference((currentPreference) =>
+        currentPreference.usesSystemTheme
+          ? {
+              ...currentPreference,
+              mode: event.matches ? 'dark' : 'light',
+            }
+          : currentPreference,
+      )
     }
 
     mediaQuery.addEventListener('change', handleThemeChange)
@@ -419,10 +428,13 @@ function App() {
   const queuedInfoModal = modalState.isOpen ? null : infoModalQueue[0] ?? null
 
   function handleToggleTheme() {
-    setThemeMode((currentTheme) => {
-      return currentTheme === 'dark' ? 'light' : 'dark'
+    const nextThemeMode = themeMode === 'dark' ? 'light' : 'dark'
+
+    saveThemeMode(nextThemeMode)
+    setThemePreference({
+      mode: nextThemeMode,
+      usesSystemTheme: false,
     })
-    setUsesSystemTheme(false)
   }
 
   if (isHydrating) {
@@ -556,25 +568,102 @@ function App() {
 }
 
 
-function isPersistedState(
-  value: Partial<PersistedState> | null | undefined,
-): value is PersistedState {
-  return Boolean(
-    value &&
-      typeof value.roomIndex === 'number' &&
-      typeof value.coins === 'number' &&
-      typeof value.statusText === 'string' &&
-      (typeof value.isNemamSeRadMode === 'boolean' ||
-        typeof value.isNemamSeRadMode === 'undefined') &&
-      value.gameState &&
-      Array.isArray(value.gameState.pets),
+function isPersistedState(value: unknown): value is PersistedState {
+  if (!isRecord(value)) {
+    return false
+  }
+
+  return (
+    isGameState(value.gameState) &&
+    isValidRoomIndex(value.roomIndex) &&
+    isNonNegativeFiniteNumber(value.coins) &&
+    typeof value.statusText === 'string' &&
+    (typeof value.isNemamSeRadMode === 'boolean' ||
+      typeof value.isNemamSeRadMode === 'undefined')
   )
+}
+
+function isGameState(value: unknown): value is GameState {
+  if (!isRecord(value) || !Array.isArray(value.pets)) {
+    return false
+  }
+
+  const selectedPetId = value.selectedPetId
+  const hasValidSelectedPetId = selectedPetId === null || typeof selectedPetId === 'string'
+
+  if (
+    !isAppScreen(value.currentScreen) ||
+    !hasValidSelectedPetId ||
+    !value.pets.every(isPet)
+  ) {
+    return false
+  }
+
+  const hasSelectedPet =
+    typeof selectedPetId === 'string' && value.pets.some((pet) => pet.id === selectedPetId)
+
+  if (selectedPetId !== null && !hasSelectedPet) {
+    return false
+  }
+
+  if (value.currentScreen === 'home') {
+    return hasSelectedPet
+  }
+
+  return true
+}
+
+function isPet(value: unknown): value is Pet {
+  return (
+    isRecord(value) &&
+    typeof value.id === 'string' &&
+    typeof value.name === 'string' &&
+    typeof value.species === 'string' &&
+    typeof value.description === 'string' &&
+    typeof value.image === 'string' &&
+    isPetMood(value.mood) &&
+    isPetStats(value.stats)
+  )
+}
+
+function isPetStats(value: unknown): value is PetStats {
+  return (
+    isRecord(value) &&
+    isStatValue(value.food) &&
+    isStatValue(value.health) &&
+    isStatValue(value.happiness) &&
+    isStatValue(value.energy)
+  )
+}
+
+function isAppScreen(value: unknown): value is AppScreen {
+  return value === 'selection' || value === 'home'
+}
+
+function isPetMood(value: unknown): value is PetMood {
+  return value === 'happy' || value === 'hungry' || value === 'sleepy' || value === 'sick'
+}
+
+function isStatValue(value: unknown) {
+  return isNonNegativeFiniteNumber(value) && value <= 100
+}
+
+function isValidRoomIndex(value: unknown): value is number {
+  return typeof value === 'number' && Number.isInteger(value) && value >= 0 && value < rooms.length
+}
+
+function isNonNegativeFiniteNumber(value: unknown): value is number {
+  return typeof value === 'number' && Number.isFinite(value) && value >= 0
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
 export default App
 
 type ThemeToggleIconProps = {
-  themeMode: 'light' | 'dark'
+  themeMode: ThemeMode
 }
 
 function ThemeToggleIcon({ themeMode }: ThemeToggleIconProps) {
@@ -601,12 +690,4 @@ function ThemeToggleIcon({ themeMode }: ThemeToggleIconProps) {
       />
     </svg>
   )
-}
-
-function getInitialThemeMode() {
-  if (typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-    return 'dark'
-  }
-
-  return 'light'
 }

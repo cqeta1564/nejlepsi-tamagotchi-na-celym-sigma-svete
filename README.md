@@ -63,6 +63,7 @@ npm run dev
 npm test
 npm run lint
 npm run build
+npm run verify:pwa
 npm run preview
 ```
 
@@ -71,7 +72,8 @@ npm run preview
 Projekt ma zakladni automaticke testy:
 
 - jednotkove testy ciste herni logiky v `src/game/roomActions.ts`,
-- integracni smoke testy React obrazovek pres Vite SSR a `react-dom/server`.
+- integracni smoke testy React obrazovek pres Vite SSR a `react-dom/server`,
+- PWA kontrolu produkcnich artefaktu pres `npm run verify:pwa` po `npm run build`.
 
 Spusteni:
 
@@ -84,7 +86,7 @@ npm test
 Projekt je pripraveny na nasazeni pres GitHub Pages.
 
 - workflow pro deploy je v `.github/workflows/deploy-pages.yml`
-- GitHub Actions spousti `npm test`, `npm run lint` a `npm run build`
+- GitHub Actions spousti `npm test`, `npm run lint`, `npm run build` a `npm run verify:pwa`
 - pri buildu na GitHub Actions se automaticky nastavi spravny `base` path podle nazvu repozitare
 - pro prvni publikaci je potreba v nastaveni repozitare zapnout GitHub Pages a jako source ponechat GitHub Actions
 
@@ -105,6 +107,7 @@ Projekt funguje jako zakladni `Progressive Web App`.
 - `index.html` odkazuje na manifest pres Vite `BASE_URL`
 - `src/main.tsx` registruje service worker v produkcnim prostredi
 - pri produkcnim buildu se vygeneruje `sw.js`, ktery prednacita app shell a assety pro offline pouziti
+- `npm run verify:pwa` kontroluje manifest, ikony, HTML odkaz a vygenerovany service worker
 - pro instalaci v telefonu nebo desktopu je potreba bezet pres `HTTPS` nebo na `localhost`
 
 ## Herni logika

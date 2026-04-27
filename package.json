@@ -8,6 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "test": "tsc -p tsconfig.test.json && node --test .test-build/tests/roomActions.test.js tests/react-ui.integration.test.mjs",
+    "verify:pwa": "node --test tests/pwa-artifacts.test.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

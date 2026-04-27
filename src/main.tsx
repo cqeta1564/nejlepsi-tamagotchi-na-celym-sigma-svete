@@ -4,9 +4,8 @@ import './index.css'
 import App from './App.tsx'
 import bobekImage from './assets/bobek.png'
 import { registerServiceWorker } from './registerServiceWorker'
+import { getInitialThemePreference } from './theme'
 import { loadCleanedImage } from './utils/imageCutout'
-
-const THEME_STORAGE_KEY = 'tamagotchi-theme'
 
 applyInitialTheme()
 
@@ -32,16 +31,10 @@ void loadCleanedImage(bobekImage, {
 })
 
 function applyInitialTheme() {
-  const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY)
-  const resolvedTheme =
-    storedTheme === 'light' || storedTheme === 'dark'
-      ? storedTheme
-      : window.matchMedia('(prefers-color-scheme: dark)').matches
-        ? 'dark'
-        : 'light'
+  const { mode } = getInitialThemePreference()
 
-  document.documentElement.dataset.theme = resolvedTheme
-  document.documentElement.style.colorScheme = resolvedTheme
+  document.documentElement.dataset.theme = mode
+  document.documentElement.style.colorScheme = mode
 }
 
 createRoot(document.getElementById('root')!).render(

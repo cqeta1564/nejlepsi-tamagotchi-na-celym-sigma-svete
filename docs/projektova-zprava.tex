@@ -299,9 +299,9 @@ PWA cast je v produkcnim vstupu aplikace zapojena temito vazbami:
   \item \texttt{index.html} obsahuje HTML odkaz na \texttt{manifest.webmanifest} pres \texttt{\%BASE\_URL\%}.
 \end{itemize}
 
-Prakticky to znamena, ze produkcni build pripravuje manifestove assety, generuje service worker a aplikace ho pri produkcnim spusteni registruje. Pro finalni overeni je vhodne jeste projit Lighthouse PWA audit a rucne zkusit offline obnovu po prvnim online nacteni.
+Prakticky to znamena, ze produkcni build pripravuje manifestove assety, generuje service worker a aplikace ho pri produkcnim spusteni registruje. PWA artefakty se overuji prikazem \texttt{npm run verify:pwa}, ktery po produkcnim buildu kontroluje manifest, povinne ikony, odkaz v \texttt{dist/index.html} a vygenerovany \texttt{sw.js} se zakladnimi event listenery.
 
-\placeholderfigure{Placeholder pro Lighthouse audit}{Doplnte screenshot z Chrome DevTools -> Lighthouse -> PWA.\\Ocekavany stav: projekt ma manifest, generovany \texttt{sw.js}, HTML odkaz na manifest a registraci service workeru.}
+\placeholderfigure{Volitelny Lighthouse dukaz}{Pro odevzdani lze doplnit screenshot z Chrome DevTools -> Lighthouse -> PWA. Technicka kontrola artefaktu je uz soucasti repozitare pres \texttt{npm run verify:pwa}.}
 
 \section{Testovani}
 
@@ -321,10 +321,11 @@ Pri lokalni kontrole 27.~4.~2026 dopadly tyto kontroly takto:
 \begin{itemize}[leftmargin=2em]
   \item \texttt{npm test} -- proslo bez chyb, celkem 8 automatickych testu,
   \item \texttt{npm run lint} -- proslo bez chyb,
-  \item \texttt{npm run build} -- proslo, TypeScript i Vite build do \texttt{dist/} byly uspesne.
+  \item \texttt{npm run build} -- proslo, TypeScript i Vite build do \texttt{dist/} byly uspesne,
+  \item \texttt{npm run verify:pwa} -- proslo, PWA manifest, ikony, HTML odkaz a generovany service worker byly zkontrolovany.
 \end{itemize}
 
-CI workflow na GitHub Actions spousti testy, lint a produkcni build pred nahranim vystupu na GitHub Pages. Automaticke testy pokryvaji herni logiku a zakladni render hlavniho React rozhrani, rucni scenare ale stale overuji chovani v realnem prohlizeci.
+CI workflow na GitHub Actions spousti testy, lint, produkcni build a PWA kontrolu pred nahranim vystupu na GitHub Pages. Automaticke testy pokryvaji herni logiku a zakladni render hlavniho React rozhrani, rucni scenare ale stale overuji chovani v realnem prohlizeci.
 
 Rucne prosle testovaci scenare:
 
@@ -451,7 +452,7 @@ Z historie vetvi a commitu je videt, ze prace byla delena paralelne mezi wirefra
 \subsection*{Co bylo problematicke}
 
 \begin{itemize}[leftmargin=2em]
-  \item PWA cast je technicky zapojena, ale porad vyzaduje rucni Lighthouse a offline overeni v realnem prohlizeci.
+  \item PWA cast je technicky zapojena a ma automatickou kontrolu artefaktu; realny Lighthouse screenshot lze doplnit jako vizualni doklad z prohlizece.
   \item Automaticke testy uz kontroluji herni logiku i zakladni render React obrazovek, ale nepokryvaji vsechny klikaci scenare v realnem prohlizeci.
   \item Pro finalni dokumentaci porad chybi skutecne screenshoty aplikace a Lighthouse vystupu.
 \end{itemize}
@@ -459,7 +460,7 @@ Z historie vetvi a commitu je videt, ze prace byla delena paralelne mezi wirefra
 \subsection*{Co by slo dale rozvijet}
 
 \begin{itemize}[leftmargin=2em]
-  \item Dolozit PWA vrstvu Lighthouse screenshotem a rucnim testem offline fallbacku a instalace na plochu.
+  \item Dolozit PWA vrstvu volitelnym Lighthouse screenshotem a rucnim testem instalace na plochu.
   \item Rozsirit stavajici automaticke testy o plne prohlizecove end-to-end scenare.
   \item Rozsirit hru o dalsi mistnosti, vice typu akci, inventar nebo vice druhu mazlicku.
   \item Pridat zvuky, denni odmeny, skore nebo statistiku delky preziti.
