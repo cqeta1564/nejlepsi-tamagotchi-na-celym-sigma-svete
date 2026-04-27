@@ -25,7 +25,6 @@ type PetCardProps = {
   onPrevRoom: () => void
   onNextRoom: () => void
   onRoomAction: () => void
-  isPetDead: boolean
   isActionDisabled: boolean
 }
 
@@ -45,7 +44,6 @@ function PetCard({
   onPrevRoom,
   onNextRoom,
   onRoomAction,
-  isPetDead,
   isActionDisabled,
 }: PetCardProps) {
   const showSleepBubble = pet.mood === 'sleepy' || pet.stats.energy <= 35
@@ -63,8 +61,21 @@ function PetCard({
 
     if (previousRoomIndex === roomIndex) {
       if (displayedBackgroundImageRef.current !== roomBackgroundImage) {
+        if (animationFrameRef.current !== null) {
+          window.cancelAnimationFrame(animationFrameRef.current)
+          animationFrameRef.current = null
+        }
+
+        if (animationTimeoutRef.current !== null) {
+          window.clearTimeout(animationTimeoutRef.current)
+          animationTimeoutRef.current = null
+        }
+
         displayedBackgroundImageRef.current = roomBackgroundImage
-        setDisplayedBackgroundImage(roomBackgroundImage)
+        animationFrameRef.current = window.requestAnimationFrame(() => {
+          animationFrameRef.current = null
+          setDisplayedBackgroundImage(roomBackgroundImage)
+        })
       }
 
       return
@@ -80,25 +91,31 @@ function PetCard({
       animationTimeoutRef.current = null
     }
 
-    setSlideDirection(getRoomSlideDirection(previousRoomIndex, roomIndex, roomCount))
-    setOutgoingBackgroundImage(displayedBackgroundImageRef.current)
+    const nextSlideDirection = getRoomSlideDirection(previousRoomIndex, roomIndex, roomCount)
+    const outgoingImage = displayedBackgroundImageRef.current
+
     displayedBackgroundImageRef.current = roomBackgroundImage
-    setDisplayedBackgroundImage(roomBackgroundImage)
-    setIsBackgroundAnimating(false)
     previousRoomIndexRef.current = roomIndex
 
     animationFrameRef.current = window.requestAnimationFrame(() => {
-      animationFrameRef.current = window.requestAnimationFrame(() => {
-        animationFrameRef.current = null
-        setIsBackgroundAnimating(true)
-      })
-    })
-
-    animationTimeoutRef.current = window.setTimeout(() => {
-      setOutgoingBackgroundImage(null)
+      setSlideDirection(nextSlideDirection)
+      setOutgoingBackgroundImage(outgoingImage)
+      setDisplayedBackgroundImage(roomBackgroundImage)
       setIsBackgroundAnimating(false)
-      animationTimeoutRef.current = null
-    }, ROOM_TRANSITION_DURATION_MS)
+
+      animationFrameRef.current = window.requestAnimationFrame(() => {
+        animationFrameRef.current = window.requestAnimationFrame(() => {
+          animationFrameRef.current = null
+          setIsBackgroundAnimating(true)
+        })
+      })
+
+      animationTimeoutRef.current = window.setTimeout(() => {
+        setOutgoingBackgroundImage(null)
+        setIsBackgroundAnimating(false)
+        animationTimeoutRef.current = null
+      }, ROOM_TRANSITION_DURATION_MS)
+    })
   }, [roomBackgroundImage, roomCount, roomIndex])
 
   useEffect(() => {

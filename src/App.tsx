@@ -454,7 +454,6 @@ function App() {
               onPrevRoom={handlePrevRoom}
               onNextRoom={handleNextRoom}
               onRoomAction={handleRoomAction}
-              isPetDead={isPetDead}
               isActionDisabled={isPetDead || cannotAffordAction}
             />
           )}

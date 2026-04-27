@@ -18,7 +18,6 @@ type HomeScreenProps = {
   onPrevRoom: () => void
   onNextRoom: () => void
   onRoomAction: () => void
-  isPetDead: boolean
   isActionDisabled: boolean
 }
 
@@ -38,7 +37,6 @@ function HomeScreen({
   onPrevRoom,
   onNextRoom,
   onRoomAction,
-  isPetDead,
   isActionDisabled,
 }: HomeScreenProps) {
   return (
@@ -65,7 +63,6 @@ function HomeScreen({
             onPrevRoom={onPrevRoom}
             onNextRoom={onNextRoom}
             onRoomAction={onRoomAction}
-            isPetDead={isPetDead}
             isActionDisabled={isActionDisabled}
           />
         </div>
