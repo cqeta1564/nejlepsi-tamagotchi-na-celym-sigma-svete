@@ -5,6 +5,8 @@ import type { Pet } from '../types'
 type HomeScreenProps = {
   pet: Pet
   roomId: 'kitchen' | 'store' | 'park' | 'casino'
+  roomIndex: number
+  roomCount: number
   roomName: string
   roomDescription: string
   roomBackgroundImage: string
@@ -23,6 +25,8 @@ type HomeScreenProps = {
 function HomeScreen({
   pet,
   roomId,
+  roomIndex,
+  roomCount,
   roomName,
   roomDescription,
   roomBackgroundImage,
@@ -48,6 +52,8 @@ function HomeScreen({
           <PetCard
             pet={pet}
             roomId={roomId}
+            roomIndex={roomIndex}
+            roomCount={roomCount}
             roomName={roomName}
             roomDescription={roomDescription}
             roomBackgroundImage={roomBackgroundImage}
