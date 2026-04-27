@@ -20,7 +20,7 @@ export const mockPets: Pet[] = [
   },
   {
     id: 'pet-2',
-    name: 'Guma',
+    name: 'Indicka pneumatika',
     species: 'Poulicni pneu',
     description: 'Tvrdy mazlicek se srdcem ze zavodni drahy a apetitem na dobrodruzstvi.',
     mood: 'hungry',

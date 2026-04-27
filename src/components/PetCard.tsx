@@ -19,6 +19,7 @@ type PetCardProps = {
   onPrevRoom: () => void
   onNextRoom: () => void
   onRoomAction: () => void
+  isPetDead: boolean
   isActionDisabled: boolean
 }
 
@@ -36,13 +37,14 @@ function PetCard({
   onPrevRoom,
   onNextRoom,
   onRoomAction,
+  isPetDead,
   isActionDisabled,
 }: PetCardProps) {
   const showSleepBubble = pet.mood === 'sleepy' || pet.stats.energy <= 35
 
   return (
     <section
-      className={`room-card room-card--${roomId}`}
+      className={`room-card room-card--${roomId}${isPetDead ? ' room-card--dead' : ''}`}
       style={{ backgroundImage: `url(${roomBackgroundImage})` } as CSSProperties}
     >
       <div className="room-card__money">
@@ -73,13 +75,13 @@ function PetCard({
 
         <button
           type="button"
-          className="wire-button wire-button--action wire-button--primary"
+          className="wire-button wire-button--action"
           onClick={onRoomAction}
           disabled={isActionDisabled}
+          aria-label={`${actionLabel} za ${actionCost} penez`}
+          title={`${actionLabel} za ${actionCost} penez`}
         >
           <CutoutImage src={actionIcon} alt="" className="wire-button__icon" />
-          {actionLabel}
-          <span className="wire-button__subtext">{actionCost} penez</span>
         </button>
 
         <button type="button" className="arrow-button" onClick={onNextRoom}>

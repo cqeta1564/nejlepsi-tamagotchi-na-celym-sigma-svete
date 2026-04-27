@@ -1,17 +1,17 @@
 export const COLORS = {
-  primary: '#AAA9B4',
-  background: '#EEF1F4',
-  surface: '#F7F8FA',
-  border: '#CFD5DD',
+  primary: '#6F86E8',
+  background: '#F4F7FB',
+  surface: '#EEF3F8',
+  border: '#D7DFEB',
 
   text: {
-    primary: '#000000',
-    secondary: '#6D7582',
+    primary: '#17253A',
+    secondary: '#68788F',
   },
 
   status: {
-    loading: '#AAA9B4',
-    error: '#C77E7E',
+    loading: '#6F86E8',
+    error: '#D56A76',
     success: '#4CD97B',
   },
 

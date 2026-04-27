@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import type { CSSProperties } from 'react'
 import HomeScreen from './screens/HomeScreen'
 import PetSelectionScreen from './screens/PetSelectionScreen'
 import StatusModal from './components/StatusModal'
@@ -12,10 +11,10 @@ import roomKitchenImage from './assets/room-kitchen.png'
 import roomParkImage from './assets/room-park.png'
 import roomStoreImage from './assets/room-store.png'
 import { mockPets } from './data/pets'
-import { COLORS } from './theme'
 import type { GameState, PetMood, PetStats } from './types'
 
 const STORAGE_KEY = 'tamagotchi-wireframe-state'
+const THEME_STORAGE_KEY = 'tamagotchi-theme'
 const STAT_DECAY_INTERVAL_MS = 12000
 const COIN_REGEN_INTERVAL_MS = 5000
 
@@ -107,6 +106,8 @@ function App() {
   const [roomIndex, setRoomIndex] = useState(0)
   const [coins, setCoins] = useState(24)
   const [statusText, setStatusText] = useState('Vyber mistnost a proved cinnost.')
+  const [themeMode, setThemeMode] = useState<'light' | 'dark'>(() => getInitialThemeMode())
+  const [usesSystemTheme, setUsesSystemTheme] = useState(() => !getStoredThemeMode())
   const [isHydrating, setIsHydrating] = useState(true)
   const [storageError, setStorageError] = useState(false)
   const [modalState, setModalState] = useState<ModalState>({
@@ -126,6 +127,27 @@ function App() {
   const isPetDead = selectedPet ? hasAnyZeroStat(selectedPet.stats) : false
   const cannotAffordAction = coins < currentRoom.actionCost
   const isHomeScreen = gameState.currentScreen === 'home' && Boolean(selectedPet)
+  const themeToggleLabel = themeMode === 'dark' ? 'svetly motiv' : 'tmavy motiv'
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = themeMode
+    document.documentElement.style.colorScheme = themeMode
+  }, [themeMode])
+
+  useEffect(() => {
+    if (!usesSystemTheme) {
+      return
+    }
+
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+    const handleThemeChange = (event: MediaQueryListEvent) => {
+      setThemeMode(event.matches ? 'dark' : 'light')
+    }
+
+    mediaQuery.addEventListener('change', handleThemeChange)
+
+    return () => mediaQuery.removeEventListener('change', handleThemeChange)
+  }, [usesSystemTheme])
 
   useEffect(() => {
     try {
@@ -314,10 +336,6 @@ function App() {
   }
 
   function handleCloseModal() {
-    if (modalState.kind === 'dead') {
-      return
-    }
-
     setModalState({
       isOpen: false,
       kind: 'restart',
@@ -339,6 +357,15 @@ function App() {
       title: '',
       message: '',
     })
+  }
+
+  function handleToggleTheme() {
+    setThemeMode((currentTheme) => {
+      const nextTheme = currentTheme === 'dark' ? 'light' : 'dark'
+      window.localStorage.setItem(THEME_STORAGE_KEY, nextTheme)
+      return nextTheme
+    })
+    setUsesSystemTheme(false)
   }
 
   if (isHydrating) {
@@ -373,23 +400,7 @@ function App() {
   }
 
   return (
-    <main
-      className={`app-page${isHomeScreen ? ' app-page--home' : ''}`}
-      style={
-        {
-          '--color-primary': COLORS.primary,
-          '--color-background': COLORS.background,
-          '--color-surface': COLORS.surface,
-          '--color-border': COLORS.border,
-          '--color-text-primary': COLORS.text.primary,
-          '--color-text-secondary': COLORS.text.secondary,
-          '--color-stat-hunger': COLORS.stats.hunger,
-          '--color-stat-health': COLORS.stats.health,
-          '--color-stat-energy': COLORS.stats.energy,
-          '--color-stat-happiness': COLORS.stats.happiness,
-        } as CSSProperties
-      }
-    >
+    <main className={`app-page${isHomeScreen ? ' app-page--home' : ''}`}>
       <section className={`phone-shell${isHomeScreen ? ' phone-shell--home' : ''}`}>
         <header className={`app-shell-header${isHomeScreen ? ' app-shell-header--home' : ''}`}>
           <div className="app-shell-header__copy">
@@ -397,15 +408,25 @@ function App() {
             <h1 className="app-shell-header__title">nejlepsi tamagotchi na celym svete</h1>
           </div>
 
-          {isHomeScreen ? (
+          <div className="app-shell-header__actions">
             <button
               type="button"
-              className="wire-button wire-button--small wire-button--primary app-shell-header__action"
-              onClick={handleRequestRestart}
+              className="wire-button wire-button--small app-shell-header__action"
+              onClick={handleToggleTheme}
             >
-              nova hra
+              {themeToggleLabel}
             </button>
-          ) : null}
+
+            {isHomeScreen ? (
+              <button
+                type="button"
+                className="wire-button wire-button--small wire-button--primary app-shell-header__action"
+                onClick={handleRequestRestart}
+              >
+                nova hra
+              </button>
+            ) : null}
+          </div>
         </header>
 
         <main className={`app-shell-main${isHomeScreen ? ' app-shell-main--home' : ''}`}>
@@ -431,6 +452,7 @@ function App() {
               onPrevRoom={handlePrevRoom}
               onNextRoom={handleNextRoom}
               onRoomAction={handleRoomAction}
+              isPetDead={isPetDead}
               isActionDisabled={isPetDead || cannotAffordAction}
             />
           )}
@@ -564,3 +586,26 @@ function isPersistedState(
 }
 
 export default App
+
+function getStoredThemeMode() {
+  if (typeof window === 'undefined') {
+    return null
+  }
+
+  const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY)
+  return storedTheme === 'light' || storedTheme === 'dark' ? storedTheme : null
+}
+
+function getInitialThemeMode() {
+  const storedTheme = getStoredThemeMode()
+
+  if (storedTheme) {
+    return storedTheme
+  }
+
+  if (typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    return 'dark'
+  }
+
+  return 'light'
+}
