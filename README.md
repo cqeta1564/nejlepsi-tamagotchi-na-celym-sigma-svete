@@ -1,5 +1,8 @@
 # Nejlepsi tamagotchi na celym sigma svete
 
+[![CI](https://github.com/cqeta1564/nejlepsi-tamagotchi-na-celym-sigma-svete/actions/workflows/ci.yml/badge.svg)](https://github.com/cqeta1564/nejlepsi-tamagotchi-na-celym-sigma-svete/actions/workflows/ci.yml)
+[![Build LaTeX documentation](https://github.com/cqeta1564/nejlepsi-tamagotchi-na-celym-sigma-svete/actions/workflows/build-latex.yml/badge.svg)](https://github.com/cqeta1564/nejlepsi-tamagotchi-na-celym-sigma-svete/actions/workflows/build-latex.yml)
+
 Browserova Tamagotchi hra postavena ve `Vite + React + TypeScript`.
 
 Projekt obsahuje vyber mazlicka, herni obrazovku s mistnostmi, postupne zhorsovani statu v case, akce podle aktualni mistnosti, automaticke ukladani do `localStorage`, svetly/tmavy motiv, PWA vystup a zakladni automaticke testy.
@@ -84,6 +87,15 @@ Projekt je pripraveny na nasazeni pres GitHub Pages.
 - GitHub Actions spousti `npm test`, `npm run lint` a `npm run build`
 - pri buildu na GitHub Actions se automaticky nastavi spravny `base` path podle nazvu repozitare
 - pro prvni publikaci je potreba v nastaveni repozitare zapnout GitHub Pages a jako source ponechat GitHub Actions
+
+## Dokumentace
+
+Hlavni projektova zprava je v `docs/projektova-zprava.tex`.
+
+- workflow pro kompilaci LaTeXu je v `.github/workflows/build-latex.yml`
+- spousti se pri zmene `.tex` souboru v `docs/`, pri pull requestu do `main` nebo rucne pres `workflow_dispatch`
+- vystupem je artifact `projektova-zprava-pdf` se souborem `docs/projektova-zprava.pdf`
+- workflow instaluje TeX Live vcetne ceske/slovenske jazykove podpory a pouziva `latexmk`
 
 ## PWA
 
