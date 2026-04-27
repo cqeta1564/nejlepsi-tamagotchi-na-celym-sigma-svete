@@ -14,8 +14,8 @@ export const mockPets: Pet[] = [
     stats: {
       food: 78,
       health: 92,
-      happiness: 95,
-      energy: 70,
+      happiness: 30,
+      energy: 64,
     },
   },
   {
@@ -27,8 +27,8 @@ export const mockPets: Pet[] = [
     image: gumaImage,
     stats: {
       food: 34,
-      health: 84,
-      happiness: 73,
+      health: 50,
+      happiness: 10,
       energy: 67,
     },
   },

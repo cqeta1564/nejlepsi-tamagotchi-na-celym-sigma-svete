@@ -14,7 +14,6 @@ import { mockPets } from './data/pets'
 import type { GameState, PetMood, PetStats } from './types'
 
 const STORAGE_KEY = 'tamagotchi-wireframe-state'
-const THEME_STORAGE_KEY = 'tamagotchi-theme'
 const STAT_DECAY_INTERVAL_MS = 12000
 const COIN_REGEN_INTERVAL_MS = 5000
 
@@ -38,7 +37,7 @@ const rooms: Room[] = [
     actionLabel: 'Kafe s cigem',
     actionCost: 8,
     imageLabel: 'Kuchyn',
-    description: 'Doplni hlad a trosku probere energii.',
+    description: 'Doplni hlad a trosku doplni energii.',
     backgroundImage: roomKitchenImage,
     actionIcon: itemKafeCigoImage,
   },
@@ -48,7 +47,7 @@ const rooms: Room[] = [
     actionLabel: 'Bily monster',
     actionCost: 10,
     imageLabel: 'Vecerka',
-    description: 'Doplni energii, ale nestoji malo.',
+    description: 'Doplni energii, bozsky napoj.',
     backgroundImage: roomStoreImage,
     actionIcon: itemMonsterImage,
   },
@@ -85,6 +84,7 @@ type PersistedState = {
   roomIndex: number
   coins: number
   statusText: string
+  isNemamSeRadMode: boolean
 }
 
 type ModalState =
@@ -101,15 +101,23 @@ type ModalState =
       message: string
     }
 
+type InfoModal = {
+  id: number
+  title: string
+  message: string
+}
+
 function App() {
   const [gameState, setGameState] = useState<GameState>(initialGameState)
   const [roomIndex, setRoomIndex] = useState(0)
   const [coins, setCoins] = useState(24)
   const [statusText, setStatusText] = useState('Vyber mistnost a proved cinnost.')
+  const [isNemamSeRadMode, setIsNemamSeRadMode] = useState(false)
   const [themeMode, setThemeMode] = useState<'light' | 'dark'>(() => getInitialThemeMode())
-  const [usesSystemTheme, setUsesSystemTheme] = useState(() => !getStoredThemeMode())
+  const [usesSystemTheme, setUsesSystemTheme] = useState(true)
   const [isHydrating, setIsHydrating] = useState(true)
   const [storageError, setStorageError] = useState(false)
+  const [infoModalQueue, setInfoModalQueue] = useState<InfoModal[]>([])
   const [modalState, setModalState] = useState<ModalState>({
     isOpen: false,
     kind: 'restart',
@@ -117,6 +125,7 @@ function App() {
     message: '',
   })
   const hasDeathModalOpenRef = useRef(false)
+  const infoModalIdRef = useRef(0)
 
   const selectedPet = useMemo(
     () => gameState.pets.find((pet) => pet.id === gameState.selectedPetId) ?? null,
@@ -127,7 +136,8 @@ function App() {
   const isPetDead = selectedPet ? hasAnyZeroStat(selectedPet.stats) : false
   const cannotAffordAction = coins < currentRoom.actionCost
   const isHomeScreen = gameState.currentScreen === 'home' && Boolean(selectedPet)
-  const themeToggleLabel = themeMode === 'dark' ? 'svetly motiv' : 'tmavy motiv'
+  const themeToggleLabel =
+    themeMode === 'dark' ? 'Prepnout na svetly motiv' : 'Prepnout na tmavy motiv'
 
   useEffect(() => {
     document.documentElement.dataset.theme = themeMode
@@ -167,6 +177,7 @@ function App() {
       setRoomIndex(parsedValue.roomIndex)
       setCoins(parsedValue.coins)
       setStatusText(parsedValue.statusText)
+      setIsNemamSeRadMode(Boolean(parsedValue.isNemamSeRadMode))
     } catch (error) {
       console.error(error)
       setStorageError(true)
@@ -185,10 +196,11 @@ function App() {
       roomIndex,
       coins,
       statusText,
+      isNemamSeRadMode,
     }
 
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(payload))
-  }, [coins, gameState, isHydrating, roomIndex, statusText])
+  }, [coins, gameState, isHydrating, isNemamSeRadMode, roomIndex, statusText])
 
   useEffect(() => {
     if (isHydrating || gameState.currentScreen !== 'home' || !selectedPet) {
@@ -252,12 +264,13 @@ function App() {
     }
 
     hasDeathModalOpenRef.current = true
-    setStatusText(`${selectedPet.name} uz to nezvladl. Musis zacit novou hru.`)
+    setInfoModalQueue([])
+    setStatusText(`${selectedPet.name} uz to nezvladl Chcipnul. Musis zacit novou hru.`)
     setModalState({
       isOpen: true,
       kind: 'dead',
       title: 'Mazlicek zemrel!!',
-      message: 'Stat neklesl vcas. Zacni novou hru.',
+      message: 'Stat klesl. Zacni novou hru.',
     })
   }, [selectedPet])
 
@@ -324,9 +337,14 @@ function App() {
     }))
     setCoins(result.coins)
     setStatusText(result.message)
+
+    if (isNemamSeRadMode) {
+      queueActionInfoModals(currentRoom.actionLabel)
+    }
   }
 
   function handleRequestRestart() {
+    setInfoModalQueue([])
     setModalState({
       isOpen: true,
       kind: 'restart',
@@ -344,12 +362,18 @@ function App() {
     })
   }
 
+  function handleCloseInfoModal() {
+    setInfoModalQueue((currentQueue) => currentQueue.slice(1))
+  }
+
   function handleRestartGame() {
     window.localStorage.removeItem(STORAGE_KEY)
     hasDeathModalOpenRef.current = false
+    setInfoModalQueue([])
     setGameState(initialGameState)
     setRoomIndex(0)
     setCoins(24)
+    setIsNemamSeRadMode(false)
     setStatusText('Vyber noveho mazlicka a zacni znovu.')
     setModalState({
       isOpen: false,
@@ -359,11 +383,38 @@ function App() {
     })
   }
 
+  function handleToggleNemamSeRadMode() {
+    setIsNemamSeRadMode((currentValue) => !currentValue)
+  }
+
+  function queueActionInfoModals(actionLabel: string) {
+    const nextModals: InfoModal[] = [
+      {
+        id: infoModalIdRef.current,
+        title: 'Akce probehla',
+        message: `${actionLabel} probehla uspesne.`,
+      },
+      {
+        id: infoModalIdRef.current + 1,
+        title: 'Akce probehla fakt',
+        message: `${actionLabel} se opravdu stala. Tohle je druhe potvrzeni.`,
+      },
+      {
+        id: infoModalIdRef.current + 2,
+        title: '3 Potvreni o Akcikce',
+        message: `${actionLabel} probehla. Treti okenko je tu jen pro jistotu.`,
+      },
+    ]
+
+    infoModalIdRef.current += nextModals.length
+    setInfoModalQueue((currentQueue) => [...currentQueue, ...nextModals])
+  }
+
+  const queuedInfoModal = modalState.isOpen ? null : infoModalQueue[0] ?? null
+
   function handleToggleTheme() {
     setThemeMode((currentTheme) => {
-      const nextTheme = currentTheme === 'dark' ? 'light' : 'dark'
-      window.localStorage.setItem(THEME_STORAGE_KEY, nextTheme)
-      return nextTheme
+      return currentTheme === 'dark' ? 'light' : 'dark'
     })
     setUsesSystemTheme(false)
   }
@@ -404,27 +455,49 @@ function App() {
       <section className={`phone-shell${isHomeScreen ? ' phone-shell--home' : ''}`}>
         <header className={`app-shell-header${isHomeScreen ? ' app-shell-header--home' : ''}`}>
           <div className="app-shell-header__copy">
-            <p className="app-shell-header__eyebrow">Virtualni Tamagotchi</p>
+            <p className="app-shell-header__eyebrow">Skibidi Tamagotchi</p>
             <h1 className="app-shell-header__title">nejlepsi tamagotchi na celym svete</h1>
           </div>
 
           <div className="app-shell-header__actions">
             <button
               type="button"
-              className="wire-button wire-button--small app-shell-header__action"
+              className="wire-button wire-button--small app-shell-header__action app-shell-header__theme-toggle"
               onClick={handleToggleTheme}
+              aria-label={themeToggleLabel}
+              title={themeToggleLabel}
             >
-              {themeToggleLabel}
+              <ThemeToggleIcon themeMode={themeMode} />
             </button>
 
             {isHomeScreen ? (
-              <button
-                type="button"
-                className="wire-button wire-button--small wire-button--primary app-shell-header__action"
-                onClick={handleRequestRestart}
-              >
-                nova hra
-              </button>
+              <>
+                <button
+                  type="button"
+                  className={[
+                    'wire-button',
+                    'wire-button--small',
+                    'app-shell-header__action',
+                    'app-shell-header__nemam-se-rad',
+                    isNemamSeRadMode ? 'wire-button--danger app-shell-header__nemam-se-rad--active' : '',
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
+                  onClick={handleToggleNemamSeRadMode}
+                  aria-pressed={isNemamSeRadMode}
+                  title="Po kazde akci otevre tri potvrzovaci okenka"
+                >
+                  nemam se rad
+                </button>
+
+                <button
+                  type="button"
+                  className="wire-button wire-button--small wire-button--primary app-shell-header__action"
+                  onClick={handleRequestRestart}
+                >
+                  nova hra
+                </button>
+              </>
             ) : null}
           </div>
         </header>
@@ -464,12 +537,12 @@ function App() {
       </section>
 
       <StatusModal
-        isOpen={modalState.isOpen}
-        title={modalState.title}
-        message={modalState.message}
-        variant={modalState.kind}
-        onClose={handleCloseModal}
-        onConfirm={handleRestartGame}
+        isOpen={modalState.isOpen || Boolean(queuedInfoModal)}
+        title={modalState.isOpen ? modalState.title : queuedInfoModal?.title ?? ''}
+        message={modalState.isOpen ? modalState.message : queuedInfoModal?.message ?? ''}
+        variant={modalState.isOpen ? modalState.kind : 'info'}
+        onClose={modalState.isOpen ? handleCloseModal : handleCloseInfoModal}
+        onConfirm={modalState.isOpen ? handleRestartGame : handleCloseInfoModal}
       />
     </main>
   )
@@ -489,7 +562,7 @@ function executeRoomAction(roomId: RoomId, stats: PetStats, currentCoins: number
     return {
       stats: nextStats,
       coins: paidCoins,
-      message: 'Kafe s cigem doplnilo hlad. Je to sice trochu cursed, ale zabralo to.',
+      message: 'Kafe s cigem doplnilo hlad.',
     }
   }
 
@@ -519,7 +592,7 @@ function executeRoomAction(roomId: RoomId, stats: PetStats, currentCoins: number
     return {
       stats: nextStats,
       coins: paidCoins,
-      message: 'Piko v parku na hlavnim nadrazi zvedlo zdravi. Ano, tenhle mazlicek je fakt sigma projekt.',
+      message: 'Piko v parku na hlavnim nadrazi zvedlo zdravi. Jen bych to nerikal policajtum',
     }
   }
 
@@ -580,6 +653,8 @@ function isPersistedState(
       typeof value.roomIndex === 'number' &&
       typeof value.coins === 'number' &&
       typeof value.statusText === 'string' &&
+      (typeof value.isNemamSeRadMode === 'boolean' ||
+        typeof value.isNemamSeRadMode === 'undefined') &&
       value.gameState &&
       Array.isArray(value.gameState.pets),
   )
@@ -587,22 +662,37 @@ function isPersistedState(
 
 export default App
 
-function getStoredThemeMode() {
-  if (typeof window === 'undefined') {
-    return null
+type ThemeToggleIconProps = {
+  themeMode: 'light' | 'dark'
+}
+
+function ThemeToggleIcon({ themeMode }: ThemeToggleIconProps) {
+  if (themeMode === 'dark') {
+    return (
+      <svg viewBox="0 0 24 24" className="app-shell-header__theme-icon" aria-hidden="true">
+        <circle cx="12" cy="12" r="4.5" fill="currentColor" />
+        <path
+          d="M12 1.75V4.25M12 19.75V22.25M4.75 12H2.25M21.75 12H19.25M5.82 5.82L4.05 4.05M19.95 19.95L18.18 18.18M18.18 5.82L19.95 4.05M4.05 19.95L5.82 18.18"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+        />
+      </svg>
+    )
   }
 
-  const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY)
-  return storedTheme === 'light' || storedTheme === 'dark' ? storedTheme : null
+  return (
+    <svg viewBox="0 0 24 24" className="app-shell-header__theme-icon" aria-hidden="true">
+      <path
+        d="M15.5 2.8C11 3.4 7.5 7.26 7.5 11.93C7.5 17.01 11.61 21.12 16.69 21.12C19.05 21.12 21.2 20.23 22.82 18.75C21.97 19 21.08 19.13 20.16 19.13C14.93 19.13 10.69 14.89 10.69 9.66C10.69 7.02 11.77 4.63 13.52 2.92C14.14 2.31 14.86 1.83 15.5 2.8Z"
+        fill="currentColor"
+      />
+    </svg>
+  )
 }
 
 function getInitialThemeMode() {
-  const storedTheme = getStoredThemeMode()
-
-  if (storedTheme) {
-    return storedTheme
-  }
-
   if (typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
     return 'dark'
   }

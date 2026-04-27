@@ -6,7 +6,7 @@ type PetFaceProps = {
 }
 
 type EyeState = 'happy' | 'sad' | 'sleepy' | 'sick'
-type MouthState = 'smile' | 'hungry' | 'frown' | 'flat'
+type MouthState = 'smile' | 'hungry' | 'flat'
 
 function getEyeState(stats: PetStats): EyeState {
   if (stats.health <= 25) {
@@ -31,10 +31,6 @@ function getMouthState(stats: PetStats): MouthState {
 
   if (stats.health <= 25) {
     return 'flat'
-  }
-
-  if (stats.happiness <= 35) {
-    return 'frown'
   }
 
   return 'smile'
@@ -161,52 +157,15 @@ function renderMouth(mouthState: MouthState) {
     )
   }
 
-  if (mouthState === 'frown') {
+  if (mouthState === 'flat') {
     return (
       <path
-        d="M46 74C56 65 67 64 80 71"
+        d="M49 74C58 72 68 72 77 73"
         fill="none"
         stroke="#111111"
         strokeWidth="4"
         strokeLinecap="round"
       />
-    )
-  }
-
-  if (mouthState === 'flat') {
-    return (
-      <>
-        <path
-          d="M49 74C58 72 68 72 77 73"
-          fill="none"
-          stroke="#111111"
-          strokeWidth="4"
-          strokeLinecap="round"
-        />
-        <g transform="translate(63 73) rotate(38)">
-          <rect x="-4" y="-2" width="8" height="26" rx="4" fill="#67D9F4" />
-          <rect x="-2.6" y="0" width="5.2" height="21" rx="2.6" fill="#91E8FB" />
-          <rect x="-1.1" y="3" width="2.2" height="14" rx="1.1" fill="#325AA6" />
-          <rect x="-1.1" y="16" width="2.2" height="5" rx="1.1" fill="#D7816C" />
-          <circle cx="0" cy="25" r="7.8" fill="#67D9F4" />
-          <circle cx="0" cy="25" r="5.7" fill="#91E8FB" />
-          <circle cx="0" cy="25" r="4.5" fill="#B97A67" />
-          <path
-            d="M-6 3H-9M-6 7H-10M-6 11H-9M-6 15H-10"
-            fill="none"
-            stroke="#325AA6"
-            strokeWidth="1.4"
-            strokeLinecap="round"
-          />
-          <path
-            d="M2.5 2.5C4.2 5.6 4.1 11.8 3 18.5"
-            fill="none"
-            stroke="rgba(255,255,255,0.34)"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-          />
-        </g>
-      </>
     )
   }
 
@@ -220,33 +179,74 @@ function renderMouth(mouthState: MouthState) {
         strokeLinejoin="round"
       />
       <rect x="63" y="65" width="8" height="12" rx="2" fill="white" />
+    </>
+  )
+}
+
+function renderTears() {
+  return (
+    <>
       <path
-        d="M18 60C15 69 15 76 23 84"
-        fill="none"
-        stroke="#111111"
-        strokeWidth="4"
-        strokeLinecap="round"
+        className="pet-face__tear pet-face__tear--left-primary"
+        d="M28 41C31 45 32 49 30 53C28 57 23.4 57 21.5 53C19.8 49.1 21.6 45.2 24.8 41.5C26 40.1 27 39.9 28 41Z"
       />
       <path
-        d="M23 84C24 81 26 79 30 79"
-        fill="none"
-        stroke="#111111"
-        strokeWidth="4"
-        strokeLinecap="round"
+        className="pet-face__tear pet-face__tear--left-secondary"
+        d="M33 47C35.4 50.4 36.1 53.8 34.4 56.8C32.8 59.6 28.8 59.6 27.2 56.9C25.8 54 27 50.7 29.6 47.5C30.7 46.2 31.9 46.1 33 47Z"
+      />
+      <path
+        className="pet-face__tear pet-face__tear--right-primary"
+        d="M90 42C93 46 94 50 92 54C90 58 85.4 58 83.5 54C81.8 50.1 83.6 46.2 86.8 42.5C88 41.1 89 40.9 90 42Z"
+      />
+      <path
+        className="pet-face__tear pet-face__tear--right-secondary"
+        d="M84 48C86.4 51.3 87.2 54.7 85.5 57.7C83.9 60.6 79.9 60.6 78.3 57.8C76.8 55 78.1 51.7 80.7 48.5C81.7 47.2 82.9 47.1 84 48Z"
       />
     </>
+  )
+}
+
+function renderThermometer() {
+  return (
+    <g transform="translate(63 73) rotate(38)">
+      <rect x="-4" y="-2" width="8" height="26" rx="4" fill="#67D9F4" />
+      <rect x="-2.6" y="0" width="5.2" height="21" rx="2.6" fill="#91E8FB" />
+      <rect x="-1.1" y="3" width="2.2" height="14" rx="1.1" fill="#325AA6" />
+      <rect x="-1.1" y="16" width="2.2" height="5" rx="1.1" fill="#D7816C" />
+      <circle cx="0" cy="25" r="7.8" fill="#67D9F4" />
+      <circle cx="0" cy="25" r="5.7" fill="#91E8FB" />
+      <circle cx="0" cy="25" r="4.5" fill="#B97A67" />
+      <path
+        d="M-6 3H-9M-6 7H-10M-6 11H-9M-6 15H-10"
+        fill="none"
+        stroke="#325AA6"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+      />
+      <path
+        d="M2.5 2.5C4.2 5.6 4.1 11.8 3 18.5"
+        fill="none"
+        stroke="rgba(255,255,255,0.34)"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    </g>
   )
 }
 
 function PetFace({ petId, stats }: PetFaceProps) {
   const eyeState = getEyeState(stats)
   const mouthState = getMouthState(stats)
+  const showTears = eyeState === 'sad'
+  const showThermometer = stats.health <= 25
 
   return (
     <span className={`pet-face pet-face--${petId}`} aria-hidden="true">
       <svg viewBox="0 0 120 92" className="pet-face__svg">
         {renderEyes(eyeState)}
         {renderMouth(mouthState)}
+        {showTears ? renderTears() : null}
+        {showThermometer ? renderThermometer() : null}
       </svg>
     </span>
   )
