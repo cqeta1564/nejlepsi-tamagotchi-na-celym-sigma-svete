@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
 import bobekImage from './assets/bobek.png'
+import { registerServiceWorker } from './registerServiceWorker'
 import { loadCleanedImage } from './utils/imageCutout'
 
 const THEME_STORAGE_KEY = 'tamagotchi-theme'
@@ -48,3 +49,5 @@ createRoot(document.getElementById('root')!).render(
     <App />
   </StrictMode>,
 )
+
+registerServiceWorker()
