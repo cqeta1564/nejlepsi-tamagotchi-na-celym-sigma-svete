@@ -9,26 +9,12 @@
 \usepackage{enumitem}
 \usepackage{parskip}
 
-\graphicspath{{./}{./images/}}
+\graphicspath{{docs/}{./}{./images/}}
 
 \hypersetup{
   colorlinks=true,
   linkcolor=black,
   urlcolor=blue
-}
-
-\newcommand{\placeholderfigure}[2]{%
-  \begin{figure}[h]
-    \centering
-    \setlength{\fboxsep}{8pt}
-    \fbox{%
-      \begin{minipage}{0.88\textwidth}
-        \centering
-        #2
-      \end{minipage}%
-    }
-    \caption{#1}
-  \end{figure}
 }
 
 \title{Projektova zprava\\Nejlepsi tamagotchi na celym sigma svete}
@@ -301,7 +287,11 @@ PWA cast je v produkcnim vstupu aplikace zapojena temito vazbami:
 
 Prakticky to znamena, ze produkcni build pripravuje manifestove assety, generuje service worker a aplikace ho pri produkcnim spusteni registruje. PWA artefakty se overuji prikazem \texttt{npm run verify:pwa}, ktery po produkcnim buildu kontroluje manifest, povinne ikony, odkaz v \texttt{dist/index.html} a vygenerovany \texttt{sw.js} se zakladnimi event listenery.
 
-\placeholderfigure{Volitelny Lighthouse dukaz}{Pro odevzdani lze doplnit screenshot z Chrome DevTools -> Lighthouse -> PWA. Technicka kontrola artefaktu je uz soucasti repozitare pres \texttt{npm run verify:pwa}.}
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.92\textwidth]{lighthouse.png}
+  \caption{Lighthouse kontrola PWA vystupu. Soubor je ulozen jako \texttt{docs/lighthouse.png}.}
+\end{figure}
 
 \section{Testovani}
 
@@ -452,39 +442,51 @@ Z historie vetvi a commitu je videt, ze prace byla delena paralelne mezi wirefra
 \subsection*{Co bylo problematicke}
 
 \begin{itemize}[leftmargin=2em]
-  \item PWA cast je technicky zapojena a ma automatickou kontrolu artefaktu; realny Lighthouse screenshot lze doplnit jako vizualni doklad z prohlizece.
+  \item PWA cast je technicky zapojena, ma automatickou kontrolu artefaktu a v priloze je doplneny Lighthouse screenshot.
   \item Automaticke testy uz kontroluji herni logiku i zakladni render React obrazovek, ale nepokryvaji vsechny klikaci scenare v realnem prohlizeci.
-  \item Pro finalni dokumentaci porad chybi skutecne screenshoty aplikace a Lighthouse vystupu.
+  \item Pro jeste presnejsi kontrolu by slo doplnit plne prohlizecove end-to-end testy.
 \end{itemize}
 
 \subsection*{Co by slo dale rozvijet}
 
 \begin{itemize}[leftmargin=2em]
-  \item Dolozit PWA vrstvu volitelnym Lighthouse screenshotem a rucnim testem instalace na plochu.
+  \item Dolozit instalaci PWA rucnim testem primo v prohlizeci.
   \item Rozsirit stavajici automaticke testy o plne prohlizecove end-to-end scenare.
   \item Rozsirit hru o dalsi mistnosti, vice typu akci, inventar nebo vice druhu mazlicku.
   \item Pridat zvuky, denni odmeny, skore nebo statistiku delky preziti.
-  \item Doplnit finalni screenshoty a pravidelne udrzovat dokumentaci pri dalsich zmenach.
+  \item Pravidelne udrzovat dokumentaci pri dalsich zmenach.
 \end{itemize}
 
 \section{Prilohy}
 
 \subsection*{Wireframe z prvniho tydne}
 
-Puvodni wireframe je ulozen v repozitari jako \texttt{docs/wireframe.svg}.
+Puvodni wireframe je ulozen v repozitari jako \texttt{docs/wireframe.svg} a pro vlozeni do zpravy je k dispozici i jako \texttt{docs/wireframe.png}.
 
-\placeholderfigure{Wireframe z prvniho tydne}{Soubor je soucasti repozitare: \texttt{docs/wireframe.svg}.\\Pri finalnim exportu lze vlozit screenshot nebo prevod SVG do PDF/PNG.}
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{wireframe.png}
+  \caption{Puvodni wireframe aplikace z prvniho tydne vyvoje. Soubor je ulozen jako \texttt{docs/wireframe.png}.}
+\end{figure}
 
 \subsection*{Screenshoty finalni aplikace}
 
-V repozitari je zdrojova aplikace a produkcni build, ale nejsou zde ulozene samostatne screenshoty finalni mobilni ani desktopove verze. Pro finalni odevzdani doporucuji doplnit alespon dva obrazky:
+V repozitari jsou ulozene screenshoty finalni aplikace z mobilni i desktopove sirky. Oba soubory jsou ve slozce \texttt{docs/} a slouzi jako vizualni doklad aktualniho stavu rozhrani:
 \begin{itemize}[leftmargin=2em]
-  \item mobilni zobrazeni vyberu mazlicka nebo herni obrazovky,
-  \item desktopove zobrazeni stejne obrazovky pro srovnani.
+  \item \texttt{docs/obrazovkaHryTelefon.png},
+  \item \texttt{docs/obrazovkaHryPocitac.png}.
 \end{itemize}
 
-\placeholderfigure{Finalni aplikace -- mobil}{Doplnte screenshot z mobilni sirky, idealne herni obrazovku s viditelnymi staty a mistnosti.}
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[height=0.72\textheight,keepaspectratio]{obrazovkaHryTelefon.png}
+  \caption{Finalni aplikace v mobilni sirce. Soubor je ulozen jako \texttt{docs/obrazovkaHryTelefon.png}.}
+\end{figure}
 
-\placeholderfigure{Finalni aplikace -- desktop}{Doplnte screenshot z desktopove sirky, aby bylo videt centrovane rozlozeni aplikace.}
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{obrazovkaHryPocitac.png}
+  \caption{Finalni aplikace v desktopove sirce. Soubor je ulozen jako \texttt{docs/obrazovkaHryPocitac.png}.}
+\end{figure}
 
 \end{document}
