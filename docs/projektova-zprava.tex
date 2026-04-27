@@ -80,7 +80,7 @@ Problem, ktery aplikace resi, neni vazny realny problem, ale herni situace: hrac
   \item GitHub Actions pro CI a deploy
   \item GitHub Pages pro hosting produkcni verze
   \item \texttt{localStorage} v prohlizeci pro obnovu rozehrane hry a ulozeni motivu
-  \item Zaklad PWA assetu: \texttt{manifest.webmanifest}, ikony a generovany \texttt{sw.js}
+  \item PWA vrstva: \texttt{manifest.webmanifest}, ikony, registrace service workeru a generovany \texttt{sw.js}
   \item AI pomocnici pri vyvoji: pouziti GitHub Copilot/Codex asistovanych uprav
 \end{itemize}
 
@@ -94,7 +94,8 @@ Aktualni zdrojove slozky jsou:
 \begin{itemize}[leftmargin=2em]
   \item \texttt{src/components} -- znovupouzitelne UI komponenty,
   \item \texttt{src/screens} -- slozene obrazovky vyberu a hry,
-  \item \texttt{src/data} -- ukazkova data mazlicku a podpurne definice akci,
+  \item \texttt{src/data} -- ukazkova data mazlicku,
+  \item \texttt{src/game} -- cista herni logika a pravidla akci v mistnostech,
   \item \texttt{src/utils} -- pomocne funkce pro obrazky,
   \item \texttt{src/assets} -- obrazky mazlicku, mistnosti a ikon.
 \end{itemize}
@@ -117,7 +118,7 @@ Aktualni zdrojove slozky jsou:
   \item \texttt{StatusModal}
 \end{itemize}
 
-V repozitari jsou jeste starsi komponenty \texttt{ActionButton}, \texttt{ActionsPanel}, \texttt{PetName}, \texttt{ScreenHeader} a \texttt{StatBar}. Aktualni render strom je ale nepouziva. Hlavni obrazovky ted jedou pres \texttt{PetSelectionScreen}, \texttt{HomeScreen}, \texttt{StatsPanel}, \texttt{PetCard} a modal.
+Starsi prototypove komponenty, ktere uz nebyly soucasti render stromu, byly z kodu odstraneny. Aktualni render strom tak odpovida skutecne pouzivanym obrazovkam a komponentam.
 
 \subsection*{Komponenty a jejich props}
 
@@ -151,7 +152,7 @@ V repozitari jsou jeste starsi komponenty \texttt{ActionButton}, \texttt{Actions
 
 \subsection*{Tok dat a spoluprace komponent}
 
-Zdroj puvodnich dat je v \texttt{src/data/pets.ts}, kde jsou definovani tri ukazkovi mazlicci: Bobek, Indicka pneumatika a Bojka. Mistnosti a realne efekty tlacitek jsou ted definovane primo v \texttt{App.tsx}. Aplikace pouziva ctyri mistnosti:
+Zdroj puvodnich dat je v \texttt{src/data/pets.ts}, kde jsou definovani tri ukazkovi mazlicci: Bobek, Indicka pneumatika a Bojka. Metadata mistnosti, nazvy, popisy a obrazky jsou v \texttt{App.tsx}. Cena a realne dopady akci jsou vyclenene do \texttt{src/game/roomActions.ts}, aby sly jednoduse jednotkove testovat. Aplikace pouziva ctyri mistnosti:
 \begin{itemize}[leftmargin=2em]
   \item \texttt{kitchen} -- Kuchyn, akce \uv{Kafe s cigem}, cena 8,
   \item \texttt{store} -- Vecerka, akce \uv{Bily monster}, cena 10,
@@ -177,6 +178,8 @@ Data potom putuji smerem dolu takto:
   \item \texttt{App -> PetCard -> CutoutImage} pro mince a ikonu akce
   \item \texttt{App -> StatusModal}
 \end{itemize}
+
+Cista herni pravidla nejsou soucasti prezentacnich komponent. Soubor \texttt{src/game/roomActions.ts} obsahuje zejmena \texttt{executeRoomAction()}, \texttt{clampStat()}, \texttt{getMoodFromStats()} a \texttt{hasAnyZeroStat()}. Diky tomu lze kontrolovat hranice statu, naladu mazlicka a vysledky akci bez spousteni React rozhrani.
 
 Udalosti se vraceji zpet nahoru pres callbacky:
 \begin{itemize}[leftmargin=2em]
@@ -220,7 +223,7 @@ Pri bezne akci ve hre je tok stavu nasledujici:
   \item Uzivatel klikne na akcni tlacitko v aktualni mistnosti.
   \item Zavola se \texttt{handleRoomAction()}.
   \item Funkce zkontroluje, jestli je mazlicek nazivu a jestli ma hrac dostatek penez.
-  \item Nasledne se spocita novy stav statistik podle aktualni mistnosti.
+  \item Nasledne se pomoci \texttt{executeRoomAction()} spocita novy stav statistik podle aktualni mistnosti.
   \item \texttt{setGameState()} prepise konkretniho mazlicka v poli \texttt{pets}.
   \item \texttt{setCoins()} upravi pocet penez a \texttt{setStatusText()} prepise informacni zpravu.
   \item React komponenty se prekresli a uzivatel okamzite vidi novy stav.
@@ -234,7 +237,7 @@ Casovana herni smycka funguje takto:
   \item kdyz libovolny stat klesne na 0, otevre se modal \uv{Mazlicek zemrel!!} a hra vyzaduje restart.
 \end{itemize}
 
-Z aktualnich statistik se zaroven odvozuje nalada mazlicka. Podle nizkeho zdravi, energie, hladu nebo stesti se meni \texttt{mood} a kresleny vyraz v komponentne \texttt{PetFace}. Pokud ma mazlicek malo energie, \texttt{PetCard} zobrazi nad avatarem bublinu \texttt{zzz}.
+Z aktualnich statistik se zaroven odvozuje nalada mazlicka. Podle nizkeho zdravi, energie nebo hladu se meni \texttt{mood} a kresleny vyraz v komponentne \texttt{PetFace}. Pokud ma mazlicek malo energie, \texttt{PetCard} zobrazi nad avatarem bublinu \texttt{zzz}.
 
 \section{Animace a vzhled}
 
@@ -269,6 +272,8 @@ Nasazeni je automatizovane pres workflow \texttt{.github/workflows/deploy-pages.
   \item po pushi do vetve \texttt{main} nebo po rucnim spusteni workflow se spusti GitHub Actions,
   \item workflow nastavi Node.js 24,
   \item nainstaluje zavislosti prikazem \texttt{npm ci},
+  \item spusti \texttt{npm test},
+  \item spusti \texttt{npm run lint},
   \item spusti \texttt{npm run build},
   \item adresar \texttt{dist/} nahraje pomoci \texttt{actions/upload-pages-artifact},
   \item nasledne ho pomoci \texttt{actions/deploy-pages} publikuje na GitHub Pages.
@@ -278,7 +283,7 @@ Soubor \texttt{vite.config.ts} nastavuje \texttt{base} cestu dynamicky. Lokalne 
 
 \section{PWA}
 
-Aktualni verze projektu ma pripravenou cast PWA infrastruktury, ale jeste nejde o plne aktivovanou PWA.
+Aktualni verze projektu ma zapojenou zakladni PWA infrastrukturu. Nejde o rozsahlou offline aplikaci se slozitymi strategiemi cache, ale pro potreby projektu obsahuje manifest, ikony, service worker a registraci service workeru v produkcnim vstupu aplikace.
 
 V repozitari se nachazi:
 \begin{itemize}[leftmargin=2em]
@@ -300,7 +305,7 @@ Prakticky to znamena, ze produkcni build pripravuje manifestove assety, generuje
 
 \section{Testovani}
 
-Repozitar obsahuje zakladni jednotkove testy spustitelne prikazem \texttt{npm test}. Testy pouzivaji vestaveny Node.js test runner a samostatny TypeScript build pres \texttt{tsconfig.test.json}, takze neni potreba dalsi testovaci framework.
+Repozitar obsahuje zakladni automaticke testy spustitelne prikazem \texttt{npm test}. Testy pouzivaji vestaveny Node.js test runner, samostatny TypeScript build pres \texttt{tsconfig.test.json} a pro React smoke testy programove spusteny Vite SSR.
 
 Aktualne automaticke testy pokryvaji cistou herni logiku v \texttt{src/game/roomActions.ts}:
 \begin{itemize}[leftmargin=2em]
@@ -310,14 +315,16 @@ Aktualne automaticke testy pokryvaji cistou herni logiku v \texttt{src/game/room
   \item vysledky akci v mistnostech vcetne deterministicke kontroly kasina.
 \end{itemize}
 
+Doplneny jsou take zakladni integracni smoke testy React rozhrani v \texttt{tests/react-ui.integration.test.mjs}. Ty pres Vite SSR vyrenderuji obrazovku vyberu mazlicka a herni obrazovku, a kontroluji, ze se v HTML objevi hlavni texty, statistiky, penize, vybrany mazlicek a akcni ovladani.
+
 Pri lokalni kontrole 27.~4.~2026 dopadly tyto kontroly takto:
 \begin{itemize}[leftmargin=2em]
-  \item \texttt{npm test} -- proslo bez chyb,
+  \item \texttt{npm test} -- proslo bez chyb, celkem 8 automatickych testu,
   \item \texttt{npm run lint} -- proslo bez chyb,
   \item \texttt{npm run build} -- proslo, TypeScript i Vite build do \texttt{dist/} byly uspesne.
 \end{itemize}
 
-CI workflow na GitHub Actions nove spousti testy, lint a produkcni build pred nahranim vystupu na GitHub Pages. Integracni testy celeho React rozhrani zatim doplnene nejsou, proto zustavaji soucasti overovani i rucni scenare.
+CI workflow na GitHub Actions spousti testy, lint a produkcni build pred nahranim vystupu na GitHub Pages. Automaticke testy pokryvaji herni logiku a zakladni render hlavniho React rozhrani, rucni scenare ale stale overuji chovani v realnem prohlizeci.
 
 Rucne prosle testovaci scenare:
 
@@ -423,8 +430,8 @@ Z historie vetvi a commitu je videt, ze prace byla delena paralelne mezi wirefra
 
 \begin{itemize}[leftmargin=2em]
   \item Martin Veber (Role A -- UI): priprava wireframu, barevneho stylu, mobilniho layoutu, pet scen, HUD prvku, animaci mistnosti, tmaveho/svetleho vzhledu a finalniho vizualniho poladeni.
-  \item Matyas Potock\'y (Role B -- logika): priprava datovych typu, vyberu mazlicka, spravy stavu, ukladani do \texttt{localStorage}, casove herni smycky, CI, branch protection, nasazeni na GitHub Pages a zaklad PWA vystupu.
-  \item Obe role na sebe navazovaly: nejdriv vznikl wireframe a komponentovy zaklad, potom se doplnila herni logika, persistence a deploy, a nakonec se vzhled znovu doladil vcetne animaci a produkcniho buildu.
+  \item Matyas Potock\'y (Role B -- logika): priprava datovych typu, vyberu mazlicka, spravy stavu, ukladani do \texttt{localStorage}, casove herni smycky, jednotkovych testu, CI, branch protection, nasazeni na GitHub Pages a PWA vystupu.
+  \item Obe role na sebe navazovaly: nejdriv vznikl wireframe a komponentovy zaklad, potom se doplnila herni logika, persistence a deploy, a nakonec se vzhled znovu doladil vcetne animaci, testu, PWA zapojeni a produkcniho buildu.
 \end{itemize}
 
 \section{Zhodnoceni projektu}
@@ -437,26 +444,26 @@ Z historie vetvi a commitu je videt, ze prace byla delena paralelne mezi wirefra
   \item Dobre funguje spojeni logiky a UI: zmeny statu se okamzite projevuji v obraze mazlicka, penizich i informacni hlasce.
   \item Prakticka je persistence do \texttt{localStorage}, diky ktere uzivatel o rozehranou hru neprijde po refreshi.
   \item Pozitivni je take to, ze projekt ma CI workflow, verejne nasazeni na GitHub Pages a aktualne prochazi testy, lint i produkcnim buildem.
-  \item Povedlo se doplnit plynuly prechod mezi mistnostmi a svetly/tmavy motiv.
+  \item Povedlo se doplnit plynuly prechod mezi mistnostmi, svetly/tmavy motiv, zaklad PWA, jednotkove testy a React smoke testy.
+  \item Kodova zakladna je uklizenejsi: stare nepouzivane prototypove komponenty byly odstraneny a README odpovida aktualni implementaci.
 \end{itemize}
 
 \subsection*{Co bylo problematicke}
 
 \begin{itemize}[leftmargin=2em]
-  \item V repozitari zustaly starsi nepouzivane komponenty z drivejsi iterace, takze kodova zakladna neni uplne uklizena.
   \item PWA cast je technicky zapojena, ale porad vyzaduje rucni Lighthouse a offline overeni v realnem prohlizeci.
-  \item Automaticke testy jsou zatim jen zakladni jednotkove testy herni logiky, takze nepokryvaji cele React rozhrani.
-  \item README obsahuje nektere starsi informace o architekture, ktere uz presne neodpovidaji aktualnimu stavu kodu.
+  \item Automaticke testy uz kontroluji herni logiku i zakladni render React obrazovek, ale nepokryvaji vsechny klikaci scenare v realnem prohlizeci.
+  \item Pro finalni dokumentaci porad chybi skutecne screenshoty aplikace a Lighthouse vystupu.
 \end{itemize}
 
 \subsection*{Co by slo dale rozvijet}
 
 \begin{itemize}[leftmargin=2em]
   \item Dolozit PWA vrstvu Lighthouse screenshotem a rucnim testem offline fallbacku a instalace na plochu.
-  \item Rozsirit automaticke testy o zakladni integracni testy hlavnich obrazovek.
+  \item Rozsirit stavajici automaticke testy o plne prohlizecove end-to-end scenare.
   \item Rozsirit hru o dalsi mistnosti, vice typu akci, inventar nebo vice druhu mazlicku.
   \item Pridat zvuky, denni odmeny, skore nebo statistiku delky preziti.
-  \item Uklidit starsi nepouzivane komponenty a sjednotit README s aktualni implementaci.
+  \item Doplnit finalni screenshoty a pravidelne udrzovat dokumentaci pri dalsich zmenach.
 \end{itemize}
 
 \section{Prilohy}
