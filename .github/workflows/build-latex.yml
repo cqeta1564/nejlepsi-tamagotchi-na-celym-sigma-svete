@@ -1,0 +1,59 @@
+name: Build LaTeX documentation
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "docs/**/*.tex"
+      - "docs/**/*.png"
+      - "docs/**/*.jpg"
+      - "docs/**/*.jpeg"
+      - ".github/workflows/build-latex.yml"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "docs/**/*.tex"
+      - "docs/**/*.png"
+      - "docs/**/*.jpg"
+      - "docs/**/*.jpeg"
+      - ".github/workflows/build-latex.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-latex:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Install TeX Live
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            latexmk \
+            texlive-fonts-recommended \
+            texlive-lang-czechslovak \
+            texlive-latex-base \
+            texlive-latex-extra \
+            texlive-latex-recommended
+
+      - name: Compile project report
+        run: |
+          latexmk \
+            -pdf \
+            -interaction=nonstopmode \
+            -halt-on-error \
+            -output-directory=docs \
+            docs/projektova-zprava.tex
+
+      - name: Upload PDF artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: projektova-zprava-pdf
+          path: docs/projektova-zprava.pdf
+          if-no-files-found: error

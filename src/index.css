@@ -694,6 +694,7 @@ img {
 }
 
 .room-card {
+  --room-slide-duration: 420ms;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -730,38 +731,51 @@ img {
   z-index: 0;
 }
 
-.room-card::after {
-  content: "";
+.room-card__backgrounds {
   position: absolute;
   inset: 0;
+  z-index: -1;
+  overflow: hidden;
   pointer-events: none;
-  background: radial-gradient(circle at center, transparent 0%, transparent 42%, rgba(9, 15, 25, 0.24) 100%);
-  opacity: 0;
-  transition: opacity 260ms ease;
-  z-index: 1;
 }
 
-.pet-choice,
-.avatar-circle,
-.wire-button,
-.stat-chip,
-.room-card,
-.room-card::before,
-.room-card__title,
-.room-card__description,
-.room-card__status,
-.room-card__sleep-bubble,
-.arrow-button,
-.system-card,
-.system-card__icon,
-.wire-modal {
-  transition:
-    background 220ms ease,
-    background-color 220ms ease,
-    border-color 220ms ease,
-    color 220ms ease,
-    box-shadow 220ms ease,
-    opacity 220ms ease;
+.room-card__background-track {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+}
+
+.room-card__backgrounds--transitioning .room-card__background-track {
+  width: 200%;
+}
+
+.room-card__backgrounds--transitioning.room-card__backgrounds--prev .room-card__background-track {
+  transform: translate3d(-50%, 0, 0);
+}
+
+.room-card__backgrounds--transitioning.room-card__backgrounds--next.room-card__backgrounds--animating .room-card__background-track {
+  transform: translate3d(-50%, 0, 0);
+  transition: transform var(--room-slide-duration) cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.room-card__backgrounds--transitioning.room-card__backgrounds--prev.room-card__backgrounds--animating .room-card__background-track {
+  transform: translate3d(0, 0, 0);
+  transition: transform var(--room-slide-duration) cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.room-card__background-slide {
+  flex: 0 0 100%;
+  height: 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  transform: scale(1.02);
+}
+
+.room-card__backgrounds--transitioning .room-card__background-slide {
+  flex-basis: 50%;
 }
 
 .room-card__money {
@@ -1285,18 +1299,10 @@ img {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .phone-shell,
-  .pet-choice,
-  .room-card,
-  .room-card__money,
-  .room-card__title,
-  .room-card__scene,
-  .room-card__meta,
-  .room-card__controls,
-  .system-card,
-  .modal-overlay,
-  .wire-modal,
-  .wire-modal__icon,
+  .room-card__background-track {
+    transition: none !important;
+  }
+
   .room-card__pet::after,
   .room-card__pet .avatar-circle,
   .room-card__sleep-bubble,

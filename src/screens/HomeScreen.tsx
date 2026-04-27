@@ -5,6 +5,8 @@ import type { Pet } from '../types'
 type HomeScreenProps = {
   pet: Pet
   roomId: 'kitchen' | 'store' | 'park' | 'casino'
+  roomIndex: number
+  roomCount: number
   roomName: string
   roomDescription: string
   roomBackgroundImage: string
@@ -16,13 +18,14 @@ type HomeScreenProps = {
   onPrevRoom: () => void
   onNextRoom: () => void
   onRoomAction: () => void
-  isPetDead: boolean
   isActionDisabled: boolean
 }
 
 function HomeScreen({
   pet,
   roomId,
+  roomIndex,
+  roomCount,
   roomName,
   roomDescription,
   roomBackgroundImage,
@@ -34,7 +37,6 @@ function HomeScreen({
   onPrevRoom,
   onNextRoom,
   onRoomAction,
-  isPetDead,
   isActionDisabled,
 }: HomeScreenProps) {
   return (
@@ -48,6 +50,8 @@ function HomeScreen({
           <PetCard
             pet={pet}
             roomId={roomId}
+            roomIndex={roomIndex}
+            roomCount={roomCount}
             roomName={roomName}
             roomDescription={roomDescription}
             roomBackgroundImage={roomBackgroundImage}
@@ -59,7 +63,6 @@ function HomeScreen({
             onPrevRoom={onPrevRoom}
             onNextRoom={onNextRoom}
             onRoomAction={onRoomAction}
-            isPetDead={isPetDead}
             isActionDisabled={isActionDisabled}
           />
         </div>

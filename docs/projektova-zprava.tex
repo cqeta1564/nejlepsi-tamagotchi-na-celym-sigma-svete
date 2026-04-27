@@ -1,0 +1,489 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[czech]{babel}
+\usepackage[a4paper,margin=2.5cm]{geometry}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{enumitem}
+\usepackage{parskip}
+
+\graphicspath{{./}{./images/}}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=black,
+  urlcolor=blue
+}
+
+\newcommand{\placeholderfigure}[2]{%
+  \begin{figure}[h]
+    \centering
+    \setlength{\fboxsep}{8pt}
+    \fbox{%
+      \begin{minipage}{0.88\textwidth}
+        \centering
+        #2
+      \end{minipage}%
+    }
+    \caption{#1}
+  \end{figure}
+}
+
+\title{Projektova zprava\\Nejlepsi tamagotchi na celym sigma svete}
+\author{Matyas Potock\'y a Martin Veber}
+\date{27.~4.~2026}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+\section{Zakladni informace}
+
+\textbf{Nazev projektu:} Nejlepsi tamagotchi na celym sigma svete
+
+\textbf{Jednoduche shrnuti:} Jde o webovou hru, ve ktere si uzivatel vybere virtualniho mazlicka a potom se o nej stara. Mazlicek postupne ztraci energii, zdravi, hlad i stesti, hrac proto musi provadet akce ve spravnou chvili a hlidat, aby zadny ukazatel neklesl na nulu.
+
+\textbf{Clenove tymu:}
+\begin{itemize}[leftmargin=2em]
+  \item Role A -- UI: Martin Veber. Mel na starosti wireframe, mobilni rozlozeni, vizualni styl, obrazovky, animace mistnosti a finalni vzhled aplikace.
+  \item Role B -- logika: Matyas Potock\'y. Mel na starosti datove modely, stav aplikace, herni smycku, ukladani, CI, nasazeni a podporne PWA assety.
+\end{itemize}
+
+\textbf{Repozitar:} \url{https://github.com/cqeta1564/nejlepsi-tamagotchi-na-celym-sigma-svete}
+
+\textbf{Nasazena aplikace:} \url{https://cqeta1564.github.io/nejlepsi-tamagotchi-na-celym-sigma-svete/}
+
+\section{Cil aplikace}
+
+Cilem aplikace je vytvorit jednoduchou a srozumitelnou hru, ktera pripomina klasicke Tamagotchi. Uzivatel si vybere jednoho virtualniho mazlicka a musi se o nej starat tak, aby mu neklesly dulezite potreby na nulu. Aplikace je urcena hlavne pro studenty nebo bezne uzivatele, kteri si chteji rychle vyzkouset kratkou browserovou hru bez instalace a bez sloziteho ovladani.
+
+Problem, ktery aplikace resi, neni vazny realny problem, ale herni situace: hrac chce mit prehlednou, rychlou a zabavnou peci o virtualniho mazlicka v jednom okne prohlizece. Aplikace proto uzivateli ukazuje jen to nejdulezitejsi: koho ma vybraneho, v jake mistnosti se prave nachazi, kolik ma penez a jak na tom mazlicek je. Vsechno je navrzene tak, aby tomu rozumel i nekdo, kdo neprogramuje.
+
+\section{Pouzite technologie}
+
+\begin{itemize}[leftmargin=2em]
+  \item React 19 a React DOM 19
+  \item TypeScript 5.9
+  \item Vite 8
+  \item CSS v souboru \texttt{src/index.css}
+  \item Tailwind CSS 4 jako soucast PostCSS build pipeline
+  \item PostCSS a Autoprefixer
+  \item ESLint 9, \texttt{typescript-eslint}, \texttt{eslint-plugin-react-hooks}, \texttt{eslint-plugin-react-refresh}
+  \item Node.js test runner pro zakladni jednotkove testy
+  \item Canvas API pro orezavani obrazku mazlicku a ikon v \texttt{src/utils/imageCutout.ts}
+  \item Node.js 24 v GitHub Actions workflow
+  \item Git a GitHub
+  \item GitHub Actions pro CI a deploy
+  \item GitHub Pages pro hosting produkcni verze
+  \item \texttt{localStorage} v prohlizeci pro obnovu rozehrane hry a ulozeni motivu
+  \item PWA vrstva: \texttt{manifest.webmanifest}, ikony, registrace service workeru a generovany \texttt{sw.js}
+  \item AI pomocnici pri vyvoji: pouziti GitHub Copilot/Codex asistovanych uprav
+\end{itemize}
+
+\section{Architektura a struktura komponent}
+
+\subsection*{Rozdeleni aplikace}
+
+Aplikace je rozdelena na hlavni kontejner \texttt{App}, dve hlavni obrazovky a vice mensich prezentacnich komponent. Vetsina dat a logiky vznika v \texttt{App.tsx}. Podrizene komponenty dostavaji data pres props a posilaji udalosti zpatky nahoru pres callback funkce.
+
+Aktualni zdrojove slozky jsou:
+\begin{itemize}[leftmargin=2em]
+  \item \texttt{src/components} -- znovupouzitelne UI komponenty,
+  \item \texttt{src/screens} -- slozene obrazovky vyberu a hry,
+  \item \texttt{src/data} -- ukazkova data mazlicku,
+  \item \texttt{src/game} -- cista herni logika a pravidla akci v mistnostech,
+  \item \texttt{src/utils} -- pomocne funkce pro obrazky,
+  \item \texttt{src/assets} -- obrazky mazlicku, mistnosti a ikon.
+\end{itemize}
+
+\subsection*{Aktualni strom aktivnich komponent}
+
+\begin{itemize}[leftmargin=2em]
+  \item \texttt{App}
+  \item \texttt{PetSelectionScreen}
+  \item \texttt{PetSelectionList}
+  \item \texttt{PetOptionCard}
+  \item \texttt{PetAvatar}
+  \item \texttt{CutoutImage}
+  \item \texttt{SelectPetButton}
+  \item \texttt{HomeScreen}
+  \item \texttt{StatsPanel}
+  \item \texttt{StatChip} (vnitrni pomocna komponenta uvnitr \texttt{StatsPanel})
+  \item \texttt{PetCard}
+  \item \texttt{PetFace}
+  \item \texttt{StatusModal}
+\end{itemize}
+
+Starsi prototypove komponenty, ktere uz nebyly soucasti render stromu, byly z kodu odstraneny. Aktualni render strom tak odpovida skutecne pouzivanym obrazovkam a komponentam.
+
+\subsection*{Komponenty a jejich props}
+
+\begin{description}[style=nextline]
+  \item[\texttt{App}] Hlavni korenova komponenta. Rozhoduje, jestli se zobrazi vyber mazlicka, herni obrazovka, nacitani nebo systemova chyba. Props nema. Drzi herni data, motiv, intervaly, uklada stav do \texttt{localStorage} a obsluhuje vsechny dulezite udalosti.
+
+  \item[\texttt{PetSelectionScreen}] Obrazovka pro vyber mazlicka. Zobrazuje seznam mazlicku a tlacitko pro potvrzeni vyberu. Prijima props \texttt{pets}, \texttt{selectedPetId}, \texttt{onSelectPet}, \texttt{onConfirmSelection}.
+
+  \item[\texttt{PetSelectionList}] Kontejner, ktery vyrenderuje karty vsech dostupnych mazlicku. Prijima props \texttt{pets}, \texttt{selectedPetId}, \texttt{onSelect}.
+
+  \item[\texttt{PetOptionCard}] Jedna karta ve vyberu mazlicka. Zobrazuje avatar a jmeno. Prijima props \texttt{pet}, \texttt{isSelected}, \texttt{onSelect}. Po kliknuti vola callback s id mazlicka.
+
+  \item[\texttt{SelectPetButton}] Tlacitko pro potvrzeni vyberu. Prijima props \texttt{disabled} a \texttt{onClick}.
+
+  \item[\texttt{HomeScreen}] Hlavni herni obrazovka po startu hry. Sklada panel statistik a hlavni kartu mistnosti. Prijima props \texttt{pet}, \texttt{roomId}, \texttt{roomIndex}, \texttt{roomCount}, \texttt{roomName}, \texttt{roomDescription}, \texttt{roomBackgroundImage}, \texttt{actionIcon}, \texttt{actionLabel}, \texttt{actionCost}, \texttt{coins}, \texttt{statusText}, \texttt{onPrevRoom}, \texttt{onNextRoom}, \texttt{onRoomAction}, \texttt{isActionDisabled}.
+
+  \item[\texttt{StatsPanel}] Panel se ctyrmi ukazateli stavu mazlicka. Prijima props \texttt{stats}. Vnitrne si pro kazdy ukazatel vytvori komponentu \texttt{StatChip}.
+
+  \item[\texttt{StatChip}] Pomocna komponenta uvnitr \texttt{StatsPanel}. Zobrazuje nazev statistiky, ciselnou hodnotu a vizualni zaplneni. Prijima props \texttt{label}, \texttt{value}, \texttt{tone}.
+
+  \item[\texttt{PetCard}] Nejvetsi prezentacni karta herni obrazovky. Zobrazuje aktualni mistnost, penize, samotneho mazlicka, statusovou zpravu a ovladaci tlacitka. Prijima stejne herni props jako \texttt{HomeScreen} vcetne \texttt{roomIndex} a \texttt{roomCount}, ktere pouziva pro plynulou animaci prechodu mezi mistnostmi.
+
+  \item[\texttt{PetAvatar}] Obaluje obrazek mazlicka a resi fallback, kdyz se obrazek nepovede nacist. Prijima props \texttt{src}, \texttt{alt}, \texttt{children}. V herni obrazovce do sebe vklada komponentu \texttt{PetFace}.
+
+  \item[\texttt{PetFace}] Kresli oblicej mazlicka pres SVG podle aktualnich statistik. Prijima props \texttt{petId} a \texttt{stats}. Podle hodnot se meni oci a pusa.
+
+  \item[\texttt{CutoutImage}] Pomocna komponenta pro nacteni obrazku a odstraneni svetleho okraje pomoci canvasu. Prijima props \texttt{src}, \texttt{alt}, \texttt{className}, volitelne \texttt{onError}.
+
+  \item[\texttt{StatusModal}] Modal pro restart, potvrzeni nebo game over. Prijima props \texttt{isOpen}, \texttt{title}, \texttt{message}, \texttt{variant}, \texttt{onClose}, \texttt{onConfirm}.
+\end{description}
+
+\subsection*{Tok dat a spoluprace komponent}
+
+Zdroj puvodnich dat je v \texttt{src/data/pets.ts}, kde jsou definovani tri ukazkovi mazlicci: Bobek, Indicka pneumatika a Bojka. Metadata mistnosti, nazvy, popisy a obrazky jsou v \texttt{App.tsx}. Cena a realne dopady akci jsou vyclenene do \texttt{src/game/roomActions.ts}, aby sly jednoduse jednotkove testovat. Aplikace pouziva ctyri mistnosti:
+\begin{itemize}[leftmargin=2em]
+  \item \texttt{kitchen} -- Kuchyn, akce \uv{Kafe s cigem}, cena 8,
+  \item \texttt{store} -- Vecerka, akce \uv{Bily monster}, cena 10,
+  \item \texttt{park} -- Park na hlavnim nadrazi, akce \uv{Dat si piko}, cena 12,
+  \item \texttt{casino} -- Kasino, akce \uv{Zatocit automatem}, cena 15.
+\end{itemize}
+
+\texttt{App} drzi:
+\begin{itemize}[leftmargin=2em]
+  \item \texttt{gameState} -- aktualni obrazovku, vybraneho mazlicka a seznam vsech mazlicku,
+  \item \texttt{roomIndex} -- aktualne vybranou mistnost,
+  \item \texttt{coins} -- pocet penez,
+  \item \texttt{statusText} -- posledni informacni zpravu pro hrace,
+  \item \texttt{themeMode} a \texttt{usesSystemTheme} -- svetly/tmavy motiv,
+  \item \texttt{modalState} -- stav modalniho okna.
+\end{itemize}
+
+Data potom putuji smerem dolu takto:
+\begin{itemize}[leftmargin=2em]
+  \item \texttt{App -> PetSelectionScreen -> PetSelectionList -> PetOptionCard -> PetAvatar -> CutoutImage}
+  \item \texttt{App -> HomeScreen -> StatsPanel -> StatChip}
+  \item \texttt{App -> HomeScreen -> PetCard -> PetAvatar -> PetFace}
+  \item \texttt{App -> PetCard -> CutoutImage} pro mince a ikonu akce
+  \item \texttt{App -> StatusModal}
+\end{itemize}
+
+Cista herni pravidla nejsou soucasti prezentacnich komponent. Soubor \texttt{src/game/roomActions.ts} obsahuje zejmena \texttt{executeRoomAction()}, \texttt{clampStat()}, \texttt{getMoodFromStats()} a \texttt{hasAnyZeroStat()}. Diky tomu lze kontrolovat hranice statu, naladu mazlicka a vysledky akci bez spousteni React rozhrani.
+
+Udalosti se vraceji zpet nahoru pres callbacky:
+\begin{itemize}[leftmargin=2em]
+  \item klik na \texttt{PetOptionCard} zavola \texttt{onSelect}, to se prenese az do \texttt{App.handleSelectPet()},
+  \item klik na \texttt{SelectPetButton} zavola \texttt{App.handleConfirmSelection()},
+  \item klik na sipky v \texttt{PetCard} zavola \texttt{App.handlePrevRoom()} nebo \texttt{App.handleNextRoom()},
+  \item klik na hlavni akcni tlacitko v \texttt{PetCard} zavola \texttt{App.handleRoomAction()},
+  \item klik na prepinac motivu zavola \texttt{App.handleToggleTheme()},
+  \item klik na novou hru zavola \texttt{App.handleRequestRestart()} a nasledne pres modal \texttt{App.handleRestartGame()}.
+\end{itemize}
+
+\section{Sprava stavu}
+
+Hlavni stav je spravovan pomoci \texttt{useState}, \texttt{useMemo}, \texttt{useEffect} a \texttt{useRef}. Aplikace si uklada rozehranou hru do \texttt{localStorage} pod klicem \texttt{tamagotchi-wireframe-state}. Motiv se uklada samostatne pod klicem \texttt{tamagotchi-theme}.
+
+Ukladany format hry je JSON objekt ve tvaru:
+
+\begin{verbatim}
+{
+  "gameState": {
+    "currentScreen": "home",
+    "selectedPetId": "pet-1",
+    "pets": [ ... ]
+  },
+  "roomIndex": 0,
+  "coins": 24,
+  "statusText": "Kuchyn je pripravena..."
+}
+\end{verbatim}
+
+Pri nacitani aplikace probehne tento postup:
+\begin{enumerate}[leftmargin=2em]
+  \item Po mountu \texttt{App} zkontroluje, jestli je v \texttt{localStorage} ulozeny predchozi stav.
+  \item Pokud data existuji a maji zakladni spravny tvar, aplikace je nacte do stavu.
+  \item Pokud jsou data rozbita nebo nevalidni, zobrazi se systemova chyba a uzivatel muze hru restartovat.
+  \item Po dokonceni hydratace se zmeny stavu automaticky znovu ukladaji.
+\end{enumerate}
+
+Pri bezne akci ve hre je tok stavu nasledujici:
+\begin{enumerate}[leftmargin=2em]
+  \item Uzivatel klikne na akcni tlacitko v aktualni mistnosti.
+  \item Zavola se \texttt{handleRoomAction()}.
+  \item Funkce zkontroluje, jestli je mazlicek nazivu a jestli ma hrac dostatek penez.
+  \item Nasledne se pomoci \texttt{executeRoomAction()} spocita novy stav statistik podle aktualni mistnosti.
+  \item \texttt{setGameState()} prepise konkretniho mazlicka v poli \texttt{pets}.
+  \item \texttt{setCoins()} upravi pocet penez a \texttt{setStatusText()} prepise informacni zpravu.
+  \item React komponenty se prekresli a uzivatel okamzite vidi novy stav.
+  \item Vedle toho se zmeneny stav automaticky znovu ulozi do \texttt{localStorage}.
+\end{enumerate}
+
+Casovana herni smycka funguje takto:
+\begin{itemize}[leftmargin=2em]
+  \item kazdych 12 sekund se snizi \texttt{food}, \texttt{health}, \texttt{happiness} a \texttt{energy},
+  \item kazdych 5 sekund se pricte 1 mince,
+  \item kdyz libovolny stat klesne na 0, otevre se modal \uv{Mazlicek zemrel!!} a hra vyzaduje restart.
+\end{itemize}
+
+Z aktualnich statistik se zaroven odvozuje nalada mazlicka. Podle nizkeho zdravi, energie nebo hladu se meni \texttt{mood} a kresleny vyraz v komponentne \texttt{PetFace}. Pokud ma mazlicek malo energie, \texttt{PetCard} zobrazi nad avatarem bublinu \texttt{zzz}.
+
+\section{Animace a vzhled}
+
+Rozlozeni aplikace vychazi z mobilniho wireframu. Hra je zabalena do vzhledu telefonni obrazovky, kde je nahore hlavicka, uprostred aktivni obrazovka a dole kratka informacni paticka. Herni cast ma samostatny panel statistik a velkou kartu mistnosti.
+
+Prechazeni mezi mistnostmi neni pouze okamzita zmena obrazku. Komponenta \texttt{PetCard} si pamatuje predchozi a aktualni obrazek mistnosti. Pri kliknuti na sipku vytvori dve vrstvy pozadi vedle sebe a pomoci CSS animace je posune. Smer animace se pocita podle \texttt{roomIndex} a \texttt{roomCount}, aby spravne fungoval i prechod z posledni mistnosti na prvni a z prvni na posledni.
+
+Aplikace ma take svetly a tmavy motiv. Pocitat se umi jak se systemovym nastavenim prohlizece, tak s rucnim prepinacem. Vybrany motiv se uklada do \texttt{localStorage}.
+
+\section{Nasazeni}
+
+Aplikace bezi na GitHub Pages:
+
+\url{https://cqeta1564.github.io/nejlepsi-tamagotchi-na-celym-sigma-svete/}
+
+Standardni build prikaz v projektu je:
+\begin{verbatim}
+npm run build
+\end{verbatim}
+
+Pri uspesnem buildu vznika vystup ve slozce \texttt{dist/}. Tato slozka obsahuje zejmena:
+\begin{itemize}[leftmargin=2em]
+  \item \texttt{dist/index.html},
+  \item \texttt{dist/assets/index-*.js},
+  \item \texttt{dist/assets/index-*.css},
+  \item staticke assety z \texttt{public/},
+  \item produkcni \texttt{dist/sw.js} vygenerovany Vite pluginem.
+\end{itemize}
+
+Nasazeni je automatizovane pres workflow \texttt{.github/workflows/deploy-pages.yml}:
+\begin{enumerate}[leftmargin=2em]
+  \item po pushi do vetve \texttt{main} nebo po rucnim spusteni workflow se spusti GitHub Actions,
+  \item workflow nastavi Node.js 24,
+  \item nainstaluje zavislosti prikazem \texttt{npm ci},
+  \item spusti \texttt{npm test},
+  \item spusti \texttt{npm run lint},
+  \item spusti \texttt{npm run build},
+  \item adresar \texttt{dist/} nahraje pomoci \texttt{actions/upload-pages-artifact},
+  \item nasledne ho pomoci \texttt{actions/deploy-pages} publikuje na GitHub Pages.
+\end{enumerate}
+
+Soubor \texttt{vite.config.ts} nastavuje \texttt{base} cestu dynamicky. Lokalne je zaklad \texttt{/}, ale v GitHub Actions se cesta odvodi podle nazvu repozitare, aby aplikace spravne fungovala pod GitHub Pages URL.
+
+\section{PWA}
+
+Aktualni verze projektu ma zapojenou zakladni PWA infrastrukturu. Nejde o rozsahlou offline aplikaci se slozitymi strategiemi cache, ale pro potreby projektu obsahuje manifest, ikony, service worker a registraci service workeru v produkcnim vstupu aplikace.
+
+V repozitari se nachazi:
+\begin{itemize}[leftmargin=2em]
+  \item \texttt{public/manifest.webmanifest} s nazvem, jazykem, ikonami, \texttt{display: standalone}, \texttt{theme\_color} a \texttt{background\_color},
+  \item PWA ikony \texttt{pwa-192x192.png}, \texttt{pwa-512x512.png}, \texttt{maskable-icon-512x512.png} a \texttt{apple-touch-icon.png},
+  \item \texttt{src/registerServiceWorker.ts}, kde je funkce pro registraci \texttt{sw.js},
+  \item vlastni Vite plugin v \texttt{vite.config.ts}, ktery pri produkcnim buildu generuje \texttt{dist/sw.js}.
+\end{itemize}
+
+PWA cast je v produkcnim vstupu aplikace zapojena temito vazbami:
+\begin{itemize}[leftmargin=2em]
+  \item \texttt{src/main.tsx} importuje a vola \texttt{registerServiceWorker()},
+  \item \texttt{index.html} obsahuje HTML odkaz na \texttt{manifest.webmanifest} pres \texttt{\%BASE\_URL\%}.
+\end{itemize}
+
+Prakticky to znamena, ze produkcni build pripravuje manifestove assety, generuje service worker a aplikace ho pri produkcnim spusteni registruje. Pro finalni overeni je vhodne jeste projit Lighthouse PWA audit a rucne zkusit offline obnovu po prvnim online nacteni.
+
+\placeholderfigure{Placeholder pro Lighthouse audit}{Doplnte screenshot z Chrome DevTools -> Lighthouse -> PWA.\\Ocekavany stav: projekt ma manifest, generovany \texttt{sw.js}, HTML odkaz na manifest a registraci service workeru.}
+
+\section{Testovani}
+
+Repozitar obsahuje zakladni automaticke testy spustitelne prikazem \texttt{npm test}. Testy pouzivaji vestaveny Node.js test runner, samostatny TypeScript build pres \texttt{tsconfig.test.json} a pro React smoke testy programove spusteny Vite SSR.
+
+Aktualne automaticke testy pokryvaji cistou herni logiku v \texttt{src/game/roomActions.ts}:
+\begin{itemize}[leftmargin=2em]
+  \item orezani hodnot statu do rozsahu 0--100,
+  \item odvozovani nalady mazlicka podle nizkych statu,
+  \item detekci stavu na nule nebo pod nulou,
+  \item vysledky akci v mistnostech vcetne deterministicke kontroly kasina.
+\end{itemize}
+
+Doplneny jsou take zakladni integracni smoke testy React rozhrani v \texttt{tests/react-ui.integration.test.mjs}. Ty pres Vite SSR vyrenderuji obrazovku vyberu mazlicka a herni obrazovku, a kontroluji, ze se v HTML objevi hlavni texty, statistiky, penize, vybrany mazlicek a akcni ovladani.
+
+Pri lokalni kontrole 27.~4.~2026 dopadly tyto kontroly takto:
+\begin{itemize}[leftmargin=2em]
+  \item \texttt{npm test} -- proslo bez chyb, celkem 8 automatickych testu,
+  \item \texttt{npm run lint} -- proslo bez chyb,
+  \item \texttt{npm run build} -- proslo, TypeScript i Vite build do \texttt{dist/} byly uspesne.
+\end{itemize}
+
+CI workflow na GitHub Actions spousti testy, lint a produkcni build pred nahranim vystupu na GitHub Pages. Automaticke testy pokryvaji herni logiku a zakladni render hlavniho React rozhrani, rucni scenare ale stale overuji chovani v realnem prohlizeci.
+
+Rucne prosle testovaci scenare:
+
+\subsection*{Scenar 1 -- prazdny start bez ulozene hry}
+\begin{itemize}[leftmargin=2em]
+  \item Vstupni podminka: v \texttt{localStorage} neni zadny klic \texttt{tamagotchi-wireframe-state}.
+  \item Kroky: otevru aplikaci poprve.
+  \item Ocekavany vysledek: zobrazi se obrazovka pro vyber mazlicka a tlacitko pro potvrzeni bude na zacatku neaktivni.
+  \item Skutecny vysledek: odpovida ocekavani.
+\end{itemize}
+
+\subsection*{Scenar 2 -- pokus pokracovat bez vyberu mazlicka}
+\begin{itemize}[leftmargin=2em]
+  \item Vstupni podminka: aplikace je na obrazovce vyberu, zadny mazlicek neni oznacen.
+  \item Kroky: pokusim se pokracovat bez predchoziho vyberu.
+  \item Ocekavany vysledek: tlacitko \uv{potvrdit vyber} zustane zablokovane a hra se nespusti.
+  \item Skutecny vysledek: odpovida ocekavani.
+\end{itemize}
+
+\subsection*{Scenar 3 -- vyber mazlicka a start hry}
+\begin{itemize}[leftmargin=2em]
+  \item Vstupni podminka: aplikace je na uvodni obrazovce.
+  \item Kroky: vyberu jednoho mazlicka a kliknu na \uv{potvrdit vyber}.
+  \item Ocekavany vysledek: zobrazi se herni obrazovka, aktualni mistnost je kuchyn a hrac ma 24 penez.
+  \item Skutecny vysledek: odpovida ocekavani.
+\end{itemize}
+
+\subsection*{Scenar 4 -- provedeni akce v mistnosti}
+\begin{itemize}[leftmargin=2em]
+  \item Vstupni podminka: hra bezi, mazlicek je nazivu a hrac ma dostatek penez.
+  \item Kroky: v kuchyni kliknu na tlacitko akce.
+  \item Ocekavany vysledek: odectou se penize, zmeni se statistiky mazlicka a prepise se statusova zprava.
+  \item Skutecny vysledek: odpovida ocekavani.
+\end{itemize}
+
+\subsection*{Scenar 5 -- nedostatek penez}
+\begin{itemize}[leftmargin=2em]
+  \item Vstupni podminka: hra bezi, ale hrac nema dost penez na aktualni akci.
+  \item Kroky: prepnu se do drazsi mistnosti a pokusim se akci spustit.
+  \item Ocekavany vysledek: akcni tlacitko bude neaktivni, aby neslo utratit vic penez, nez je k dispozici.
+  \item Skutecny vysledek: odpovida ocekavani.
+\end{itemize}
+
+\subsection*{Scenar 6 -- casovy pokles statu}
+\begin{itemize}[leftmargin=2em]
+  \item Vstupni podminka: hra bezi na domovske obrazovce.
+  \item Kroky: nic neudelam a pockam alespon 12 sekund.
+  \item Ocekavany vysledek: hlad, zdravi, stesti a energie klesnou podle hernich pravidel a zmeni se statusova zprava.
+  \item Skutecny vysledek: odpovida ocekavani.
+\end{itemize}
+
+\subsection*{Scenar 7 -- prechod mezi mistnostmi}
+\begin{itemize}[leftmargin=2em]
+  \item Vstupni podminka: hra bezi a je videt hlavni karta mistnosti.
+  \item Kroky: kliknu na levou nebo pravou sipku, pripadne prejdu z posledni mistnosti na prvni.
+  \item Ocekavany vysledek: zmeni se nazev, popis, ikona akce i pozadi mistnosti; pozadi se plynule posune jako sousedni obrazovky.
+  \item Skutecny vysledek: odpovida ocekavani.
+\end{itemize}
+
+\subsection*{Scenar 8 -- game over}
+\begin{itemize}[leftmargin=2em]
+  \item Vstupni podminka: nektery stat mazlicka je tesne nad nulou.
+  \item Kroky: necham bezet hru, dokud jeden stat neklesne na 0.
+  \item Ocekavany vysledek: otevre se modal s informaci o smrti mazlicka a hra vyzaduje restart.
+  \item Skutecny vysledek: odpovida ocekavani.
+\end{itemize}
+
+\subsection*{Scenar 9 -- obnova po reloadu}
+\begin{itemize}[leftmargin=2em]
+  \item Vstupni podminka: hra je rozehrana a v \texttt{localStorage} je ulozen stav.
+  \item Kroky: obnovim stranku v prohlizeci.
+  \item Ocekavany vysledek: aplikace nacte predchoziho mazlicka, mistnost, penize i posledni stav hry.
+  \item Skutecny vysledek: odpovida ocekavani.
+\end{itemize}
+
+\subsection*{Scenar 10 -- rozbita ulozena data}
+\begin{itemize}[leftmargin=2em]
+  \item Vstupni podminka: v \texttt{localStorage} je schvalne vlozen nevalidni JSON nebo spatny tvar dat.
+  \item Kroky: obnovim stranku.
+  \item Ocekavany vysledek: zobrazi se systemova chyba a tlacitko pro novy zacatek.
+  \item Skutecny vysledek: odpovida ocekavani.
+\end{itemize}
+
+\subsection*{Scenar 11 -- svetly a tmavy motiv}
+\begin{itemize}[leftmargin=2em]
+  \item Vstupni podminka: aplikace je otevrena a prohlizec podporuje \texttt{prefers-color-scheme}.
+  \item Kroky: kliknu na tlacitko pro prepnuti motivu a potom obnovim stranku.
+  \item Ocekavany vysledek: motiv se prepne a po reloadu zustane ulozeny.
+  \item Skutecny vysledek: odpovida ocekavani.
+\end{itemize}
+
+\subsection*{Scenar 12 -- chyba site / offline stav}
+\begin{itemize}[leftmargin=2em]
+  \item Vstupni podminka: uzivatel odpoji internet a chce aplikaci otevrit znovu.
+  \item Kroky: vypnu pripojeni a zkusim obnovit nebo znovu otevrit nasazenou aplikaci.
+  \item Ocekavany vysledek: po prvnim online nacteni by service worker mel umet vratit app shell a prednactene assety.
+  \item Skutecny vysledek: offline provoz je potreba jeste rucne overit v produkcnim prohlizeci.
+\end{itemize}
+
+\section{Rozdeleni prace}
+
+Z historie vetvi a commitu je videt, ze prace byla delena paralelne mezi wireframe/UI cast a logickou/infrastrukturni cast:
+
+\begin{itemize}[leftmargin=2em]
+  \item Martin Veber (Role A -- UI): priprava wireframu, barevneho stylu, mobilniho layoutu, pet scen, HUD prvku, animaci mistnosti, tmaveho/svetleho vzhledu a finalniho vizualniho poladeni.
+  \item Matyas Potock\'y (Role B -- logika): priprava datovych typu, vyberu mazlicka, spravy stavu, ukladani do \texttt{localStorage}, casove herni smycky, jednotkovych testu, CI, branch protection, nasazeni na GitHub Pages a PWA vystupu.
+  \item Obe role na sebe navazovaly: nejdriv vznikl wireframe a komponentovy zaklad, potom se doplnila herni logika, persistence a deploy, a nakonec se vzhled znovu doladil vcetne animaci, testu, PWA zapojeni a produkcniho buildu.
+\end{itemize}
+
+\section{Zhodnoceni projektu}
+
+\subsection*{Co se podarilo}
+
+\begin{itemize}[leftmargin=2em]
+  \item Podarilo se vytvorit funkcni browserovou hru, ktera ma jasny herni cil a jednoduche ovladani.
+  \item Vysledna aplikace pusobi vizualne jednotne a mobile-first rozlozeni je na tak maly projekt nadprumerne propracovane.
+  \item Dobre funguje spojeni logiky a UI: zmeny statu se okamzite projevuji v obraze mazlicka, penizich i informacni hlasce.
+  \item Prakticka je persistence do \texttt{localStorage}, diky ktere uzivatel o rozehranou hru neprijde po refreshi.
+  \item Pozitivni je take to, ze projekt ma CI workflow, verejne nasazeni na GitHub Pages a aktualne prochazi testy, lint i produkcnim buildem.
+  \item Povedlo se doplnit plynuly prechod mezi mistnostmi, svetly/tmavy motiv, zaklad PWA, jednotkove testy a React smoke testy.
+  \item Kodova zakladna je uklizenejsi: stare nepouzivane prototypove komponenty byly odstraneny a README odpovida aktualni implementaci.
+\end{itemize}
+
+\subsection*{Co bylo problematicke}
+
+\begin{itemize}[leftmargin=2em]
+  \item PWA cast je technicky zapojena, ale porad vyzaduje rucni Lighthouse a offline overeni v realnem prohlizeci.
+  \item Automaticke testy uz kontroluji herni logiku i zakladni render React obrazovek, ale nepokryvaji vsechny klikaci scenare v realnem prohlizeci.
+  \item Pro finalni dokumentaci porad chybi skutecne screenshoty aplikace a Lighthouse vystupu.
+\end{itemize}
+
+\subsection*{Co by slo dale rozvijet}
+
+\begin{itemize}[leftmargin=2em]
+  \item Dolozit PWA vrstvu Lighthouse screenshotem a rucnim testem offline fallbacku a instalace na plochu.
+  \item Rozsirit stavajici automaticke testy o plne prohlizecove end-to-end scenare.
+  \item Rozsirit hru o dalsi mistnosti, vice typu akci, inventar nebo vice druhu mazlicku.
+  \item Pridat zvuky, denni odmeny, skore nebo statistiku delky preziti.
+  \item Doplnit finalni screenshoty a pravidelne udrzovat dokumentaci pri dalsich zmenach.
+\end{itemize}
+
+\section{Prilohy}
+
+\subsection*{Wireframe z prvniho tydne}
+
+Puvodni wireframe je ulozen v repozitari jako \texttt{docs/wireframe.svg}.
+
+\placeholderfigure{Wireframe z prvniho tydne}{Soubor je soucasti repozitare: \texttt{docs/wireframe.svg}.\\Pri finalnim exportu lze vlozit screenshot nebo prevod SVG do PDF/PNG.}
+
+\subsection*{Screenshoty finalni aplikace}
+
+V repozitari je zdrojova aplikace a produkcni build, ale nejsou zde ulozene samostatne screenshoty finalni mobilni ani desktopove verze. Pro finalni odevzdani doporucuji doplnit alespon dva obrazky:
+\begin{itemize}[leftmargin=2em]
+  \item mobilni zobrazeni vyberu mazlicka nebo herni obrazovky,
+  \item desktopove zobrazeni stejne obrazovky pro srovnani.
+\end{itemize}
+
+\placeholderfigure{Finalni aplikace -- mobil}{Doplnte screenshot z mobilni sirky, idealne herni obrazovku s viditelnymi staty a mistnosti.}
+
+\placeholderfigure{Finalni aplikace -- desktop}{Doplnte screenshot z desktopove sirky, aby bylo videt centrovane rozlozeni aplikace.}
+
+\end{document}

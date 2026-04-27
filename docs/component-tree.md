@@ -23,6 +23,6 @@ App
 State and data ownership:
 
 - `App` owns the game state, interval ticks, screen transitions and persistence.
-- Room actions are defined inline in `src/App.tsx` together with their game effects.
+- Room metadata is defined in `src/App.tsx`; action costs and effects live in `src/game/roomActions.ts`.
 - `src/data/pets.ts` provides sample pet data for the UI.
 - Presentational components receive typed props and stay focused on rendering.
