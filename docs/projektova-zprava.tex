@@ -73,6 +73,7 @@ Problem, ktery aplikace resi, neni vazny realny problem, ale herni situace: hrac
   \item Tailwind CSS 4 jako soucast PostCSS build pipeline
   \item PostCSS a Autoprefixer
   \item ESLint 9, \texttt{typescript-eslint}, \texttt{eslint-plugin-react-hooks}, \texttt{eslint-plugin-react-refresh}
+  \item Node.js test runner pro zakladni jednotkove testy
   \item Canvas API pro orezavani obrazku mazlicku a ikon v \texttt{src/utils/imageCutout.ts}
   \item Node.js 24 v GitHub Actions workflow
   \item Git a GitHub
@@ -287,25 +288,36 @@ V repozitari se nachazi:
   \item vlastni Vite plugin v \texttt{vite.config.ts}, ktery pri produkcnim buildu generuje \texttt{dist/sw.js}.
 \end{itemize}
 
-Soucasne ale chybi dve dulezite vazby:
+PWA cast je v produkcnim vstupu aplikace zapojena temito vazbami:
 \begin{itemize}[leftmargin=2em]
-  \item \texttt{src/main.tsx} zatim neimportuje a nevola \texttt{registerServiceWorker()},
-  \item \texttt{index.html} zatim neobsahuje HTML odkaz na manifest.
+  \item \texttt{src/main.tsx} importuje a vola \texttt{registerServiceWorker()},
+  \item \texttt{index.html} obsahuje HTML odkaz na \texttt{manifest.webmanifest} pres \texttt{\%BASE\_URL\%}.
 \end{itemize}
 
-Prakticky to znamena, ze build uz umi pripravit manifestove assety a service worker soubor, ale prohlizec je v aktualnim zapojeni nemusi pouzit jako plnohodnotnou instalovatelnou PWA. Z pohledu Lighthouse by proto PWA audit pravdepodobne jeste nebyl ciste splneny. Pro dodelani by stacilo doplnit odkaz na manifest do HTML a skutecne zavolat registraci service workeru v produkcnim vstupu aplikace.
+Prakticky to znamena, ze produkcni build pripravuje manifestove assety, generuje service worker a aplikace ho pri produkcnim spusteni registruje. Pro finalni overeni je vhodne jeste projit Lighthouse PWA audit a rucne zkusit offline obnovu po prvnim online nacteni.
 
-\placeholderfigure{Placeholder pro Lighthouse audit}{Doplnte screenshot z Chrome DevTools -> Lighthouse -> PWA.\\Ocekavany stav: projekt ma manifest a generovany \texttt{sw.js}, ale registrace a manifest link jeste nejsou plne zapojene.}
+\placeholderfigure{Placeholder pro Lighthouse audit}{Doplnte screenshot z Chrome DevTools -> Lighthouse -> PWA.\\Ocekavany stav: projekt ma manifest, generovany \texttt{sw.js}, HTML odkaz na manifest a registraci service workeru.}
 
 \section{Testovani}
 
-Automaticke jednotkove ani integracni testy v repozitari momentalne nejsou. Overovani probiha hlavne rucne a doplnkove pres CI, ktere spousti lint a build.
+Repozitar obsahuje zakladni jednotkove testy spustitelne prikazem \texttt{npm test}. Testy pouzivaji vestaveny Node.js test runner a samostatny TypeScript build pres \texttt{tsconfig.test.json}, takze neni potreba dalsi testovaci framework.
+
+Aktualne automaticke testy pokryvaji cistou herni logiku v \texttt{src/game/roomActions.ts}:
+\begin{itemize}[leftmargin=2em]
+  \item orezani hodnot statu do rozsahu 0--100,
+  \item odvozovani nalady mazlicka podle nizkych statu,
+  \item detekci stavu na nule nebo pod nulou,
+  \item vysledky akci v mistnostech vcetne deterministicke kontroly kasina.
+\end{itemize}
 
 Pri lokalni kontrole 27.~4.~2026 dopadly tyto kontroly takto:
 \begin{itemize}[leftmargin=2em]
+  \item \texttt{npm test} -- proslo bez chyb,
   \item \texttt{npm run lint} -- proslo bez chyb,
   \item \texttt{npm run build} -- proslo, TypeScript i Vite build do \texttt{dist/} byly uspesne.
 \end{itemize}
+
+CI workflow na GitHub Actions nove spousti testy, lint a produkcni build pred nahranim vystupu na GitHub Pages. Integracni testy celeho React rozhrani zatim doplnene nejsou, proto zustavaji soucasti overovani i rucni scenare.
 
 Rucne prosle testovaci scenare:
 
@@ -401,8 +413,8 @@ Rucne prosle testovaci scenare:
 \begin{itemize}[leftmargin=2em]
   \item Vstupni podminka: uzivatel odpoji internet a chce aplikaci otevrit znovu.
   \item Kroky: vypnu pripojeni a zkusim obnovit nebo znovu otevrit nasazenou aplikaci.
-  \item Ocekavany vysledek: protoze PWA cast jeste neni plne zapojena, aplikace nemusi po refreshi spolehlive offline fungovat.
-  \item Skutecny vysledek: offline provoz zatim neni spolehlive garantovany.
+  \item Ocekavany vysledek: po prvnim online nacteni by service worker mel umet vratit app shell a prednactene assety.
+  \item Skutecny vysledek: offline provoz je potreba jeste rucne overit v produkcnim prohlizeci.
 \end{itemize}
 
 \section{Rozdeleni prace}
@@ -424,7 +436,7 @@ Z historie vetvi a commitu je videt, ze prace byla delena paralelne mezi wirefra
   \item Vysledna aplikace pusobi vizualne jednotne a mobile-first rozlozeni je na tak maly projekt nadprumerne propracovane.
   \item Dobre funguje spojeni logiky a UI: zmeny statu se okamzite projevuji v obraze mazlicka, penizich i informacni hlasce.
   \item Prakticka je persistence do \texttt{localStorage}, diky ktere uzivatel o rozehranou hru neprijde po refreshi.
-  \item Pozitivni je take to, ze projekt ma CI workflow, verejne nasazeni na GitHub Pages a aktualne prochazi lint i produkcnim buildem.
+  \item Pozitivni je take to, ze projekt ma CI workflow, verejne nasazeni na GitHub Pages a aktualne prochazi testy, lint i produkcnim buildem.
   \item Povedlo se doplnit plynuly prechod mezi mistnostmi a svetly/tmavy motiv.
 \end{itemize}
 
@@ -432,16 +444,16 @@ Z historie vetvi a commitu je videt, ze prace byla delena paralelne mezi wirefra
 
 \begin{itemize}[leftmargin=2em]
   \item V repozitari zustaly starsi nepouzivane komponenty z drivejsi iterace, takze kodova zakladna neni uplne uklizena.
-  \item PWA cast je jen castecne pripravena. Existuje manifest, ikony a generovani \texttt{sw.js}, ale registrace service workeru a odkaz na manifest zatim nejsou plne zapojene.
-  \item Projekt zatim nema automaticke testy, takze spoleha hlavne na rucni kontrolu, lint, TypeScript a build.
+  \item PWA cast je technicky zapojena, ale porad vyzaduje rucni Lighthouse a offline overeni v realnem prohlizeci.
+  \item Automaticke testy jsou zatim jen zakladni jednotkove testy herni logiky, takze nepokryvaji cele React rozhrani.
   \item README obsahuje nektere starsi informace o architekture, ktere uz presne neodpovidaji aktualnimu stavu kodu.
 \end{itemize}
 
 \subsection*{Co by slo dale rozvijet}
 
 \begin{itemize}[leftmargin=2em]
-  \item Dodelat skutecnou PWA vrstvu: zapojit manifest v HTML, zavolat registraci service workeru, otestovat offline fallback a instalaci na plochu.
-  \item Pridat automaticke testy, idealne jednotkove testy herni logiky a zakladni integracni testy hlavnich obrazovek.
+  \item Dolozit PWA vrstvu Lighthouse screenshotem a rucnim testem offline fallbacku a instalace na plochu.
+  \item Rozsirit automaticke testy o zakladni integracni testy hlavnich obrazovek.
   \item Rozsirit hru o dalsi mistnosti, vice typu akci, inventar nebo vice druhu mazlicku.
   \item Pridat zvuky, denni odmeny, skore nebo statistiku delky preziti.
   \item Uklidit starsi nepouzivane komponenty a sjednotit README s aktualni implementaci.

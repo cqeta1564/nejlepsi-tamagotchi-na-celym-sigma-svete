@@ -49,7 +49,16 @@ Aplikace se potom otevre ve Vite development serveru, standardne na `http://loca
 npm run dev
 npm run build
 npm run lint
+npm test
 npm run preview
+```
+
+## Testovani
+
+Projekt ma zakladni jednotkove testy herni logiky. Bezi pres vestaveny Node.js test runner a samostatny TypeScript build:
+
+```bash
+npm test
 ```
 
 ## GitHub Pages
