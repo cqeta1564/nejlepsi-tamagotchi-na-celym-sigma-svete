@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
-import coinIcon from '../assets/item-coins.png'
+import coinIcon from '../assets/item-coins.webp'
 import CutoutImage from './CutoutImage'
 import PetAvatar from './PetAvatar'
 import PetFace from './PetFace'
@@ -19,6 +19,8 @@ type PetCardProps = {
   roomDescription: string
   roomBackgroundImage: string
   actionIcon: string
+  actionIconWidth?: number
+  actionIconHeight?: number
   actionLabel: string
   actionCost: number
   coins: number
@@ -38,6 +40,8 @@ function PetCard({
   roomDescription,
   roomBackgroundImage,
   actionIcon,
+  actionIconWidth = 512,
+  actionIconHeight = 512,
   actionLabel,
   actionCost,
   coins,
@@ -192,7 +196,7 @@ function PetCard({
       </div>
 
       <div className="room-card__money">
-        <CutoutImage src={coinIcon} alt="" className="money-dot" />
+        <CutoutImage src={coinIcon} alt="" className="money-dot" width={256} height={256} />
         <span>penize {coins}</span>
       </div>
 
@@ -233,7 +237,13 @@ function PetCard({
           aria-label={`${actionLabel} za ${actionCost} penez`}
           title={`${actionLabel} za ${actionCost} penez`}
         >
-          <CutoutImage src={actionIcon} alt="" className="wire-button__icon" />
+          <CutoutImage
+            src={actionIcon}
+            alt=""
+            className="wire-button__icon"
+            width={actionIconWidth}
+            height={actionIconHeight}
+          />
         </button>
 
         <button type="button" className="arrow-button" onClick={onNextRoom}>

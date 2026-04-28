@@ -11,6 +11,8 @@ type HomeScreenProps = {
   roomDescription: string
   roomBackgroundImage: string
   actionIcon: string
+  actionIconWidth?: number
+  actionIconHeight?: number
   actionLabel: string
   actionCost: number
   coins: number
@@ -30,6 +32,8 @@ function HomeScreen({
   roomDescription,
   roomBackgroundImage,
   actionIcon,
+  actionIconWidth,
+  actionIconHeight,
   actionLabel,
   actionCost,
   coins,
@@ -56,6 +60,8 @@ function HomeScreen({
             roomDescription={roomDescription}
             roomBackgroundImage={roomBackgroundImage}
             actionIcon={actionIcon}
+            actionIconWidth={actionIconWidth}
+            actionIconHeight={actionIconHeight}
             actionLabel={actionLabel}
             actionCost={actionCost}
             coins={coins}

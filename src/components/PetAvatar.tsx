@@ -19,6 +19,8 @@ function PetAvatar({ src, alt, children }: PetAvatarProps) {
           src={src}
           alt=""
           className="avatar-circle__image"
+          width={768}
+          height={768}
           onError={() => setHasError(true)}
         />
       ) : null}

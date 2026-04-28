@@ -1,6 +1,6 @@
-import bobekImage from '../assets/bobek.png'
-import bojkaImage from '../assets/bojka.png'
-import gumaImage from '../assets/guma.png'
+import bobekImage from '../assets/bobek.webp'
+import bojkaImage from '../assets/bojka.webp'
+import gumaImage from '../assets/guma.webp'
 import type { Pet } from '../types'
 
 export const mockPets: Pet[] = [

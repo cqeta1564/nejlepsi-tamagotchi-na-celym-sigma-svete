@@ -2,14 +2,14 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import HomeScreen from './screens/HomeScreen'
 import PetSelectionScreen from './screens/PetSelectionScreen'
 import StatusModal from './components/StatusModal'
-import itemAutomatImage from './assets/item-automat.png'
-import itemKafeCigoImage from './assets/item-kafe-cigo.png'
-import itemMonsterImage from './assets/item-monster.png'
-import itemParkDangerImage from './assets/item-park-danger.png'
-import roomCasinoImage from './assets/room-casino.png'
-import roomKitchenImage from './assets/room-kitchen.png'
-import roomParkImage from './assets/room-park.png'
-import roomStoreImage from './assets/room-store.png'
+import itemAutomatImage from './assets/item-automat.webp'
+import itemKafeCigoImage from './assets/item-kafe-cigo.webp'
+import itemMonsterImage from './assets/item-monster.webp'
+import itemParkDangerImage from './assets/item-park-danger.webp'
+import roomCasinoImage from './assets/room-casino.webp'
+import roomKitchenImage from './assets/room-kitchen.webp'
+import roomParkImage from './assets/room-park.webp'
+import roomStoreImage from './assets/room-store.webp'
 import { mockPets } from './data/pets'
 import {
   ROOM_ACTION_COSTS,
@@ -35,6 +35,8 @@ type Room = {
   description: string
   backgroundImage: string
   actionIcon: string
+  actionIconWidth: number
+  actionIconHeight: number
 }
 
 const rooms: Room[] = [
@@ -47,6 +49,8 @@ const rooms: Room[] = [
     description: 'Doplni hlad a trosku doplni energii.',
     backgroundImage: roomKitchenImage,
     actionIcon: itemKafeCigoImage,
+    actionIconWidth: 512,
+    actionIconHeight: 512,
   },
   {
     id: 'store',
@@ -57,6 +61,8 @@ const rooms: Room[] = [
     description: 'Doplni energii, bozsky napoj.',
     backgroundImage: roomStoreImage,
     actionIcon: itemMonsterImage,
+    actionIconWidth: 512,
+    actionIconHeight: 512,
   },
   {
     id: 'park',
@@ -67,6 +73,8 @@ const rooms: Room[] = [
     description: 'Zvedne zdravi a trochu naladu.',
     backgroundImage: roomParkImage,
     actionIcon: itemParkDangerImage,
+    actionIconWidth: 512,
+    actionIconHeight: 341,
   },
   {
     id: 'casino',
@@ -77,6 +85,8 @@ const rooms: Room[] = [
     description: 'Doplni stesti a muzes vyhrat nebo prohrat penize.',
     backgroundImage: roomCasinoImage,
     actionIcon: itemAutomatImage,
+    actionIconWidth: 512,
+    actionIconHeight: 512,
   },
 ]
 
@@ -557,6 +567,8 @@ function App() {
               roomDescription={currentRoom.description}
               roomBackgroundImage={currentRoom.backgroundImage}
               actionIcon={currentRoom.actionIcon}
+              actionIconWidth={currentRoom.actionIconWidth}
+              actionIconHeight={currentRoom.actionIconHeight}
               actionLabel={currentRoom.actionLabel}
               actionCost={currentRoom.actionCost}
               coins={coins}
